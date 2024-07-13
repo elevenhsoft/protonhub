@@ -1,0 +1,23 @@
+{{define "head"}}
+<title>ProtonHub :: Create new launcher</title>
+{{end}} {{define "body"}}
+<h1>Create new launcher</h1>
+
+<div class="row">
+  <form enctype="multipart/form-data" action="/create" method="POST">
+    <div class="mb-3">
+      <label for="launcherName" class="form-label">Launcher name</label>
+      <input type="text" class="form-control" name="launcherName" />
+    </div>
+    <div class="mb-3">
+      <label for="launcherIcon" class="form-label"
+        >Icon for your launcher</label
+      >
+      <input class="form-control" type="file" name="launcherIcon" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Done</button>
+  </form>
+</div>
+
+{{end}}
