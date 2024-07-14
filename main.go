@@ -14,7 +14,7 @@ func main() {
 	mux := http.NewServeMux()
 	Routing(mux)
 
-	fmt.Printf("Starting server on http://%s:%s/", IP, PORT)
+	fmt.Printf("Starting server on http://%s:%s/\n", IP, PORT)
 
 	err := http.ListenAndServe(fmt.Sprintf("%s:%s", IP, PORT), mux)
 

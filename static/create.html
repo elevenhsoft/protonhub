@@ -4,20 +4,78 @@
 <h1>Create new launcher</h1>
 
 <div class="row">
-  <form enctype="multipart/form-data" action="/create" method="POST">
+  <form action="/create" method="POST">
     <div class="mb-3">
       <label for="launcherName" class="form-label">Launcher name</label>
       <input type="text" class="form-control" name="launcherName" />
     </div>
     <div class="mb-3">
-      <label for="launcherIcon" class="form-label"
-        >Icon for your launcher</label
-      >
-      <input class="form-control" type="file" name="launcherIcon" />
+      <label for="protonPath" class="form-label">Proton Path</label>
+      <input
+        type="text"
+        class="form-control"
+        name="protonPath"
+        placeholder="~/GE-Proton30"
+      />
     </div>
-
+    <div class="mb-3">
+      <label for="prefixPath" class="form-label">Prefix Path</label>
+      <input
+        type="text"
+        class="form-control"
+        name="prefixPath"
+        placeholder="~/.wine"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="launcherPathExe" class="form-label">Run this file</label>
+      <input
+        type="text"
+        class="form-control"
+        name="launcherPathExe"
+        placeholder="~/foo.exe"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="launcherExeArgs" class="form-label"
+        >Run with this arguments</label
+      >
+      <input
+        type="text"
+        class="form-control"
+        name="launcherExeArgs"
+        placeholder="-opengl, -SkipBuildPatchPrereq"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="launcherGameId" class="form-label">Game ID</label>
+      <input
+        type="text"
+        class="form-control"
+        name="launcherGameId"
+        placeholder="umu-271590"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="launcherGameStore" class="form-label">Game store</label>
+      <select
+        class="form-select"
+        name="launcherGameStore"
+        aria-label="game-store"
+      >
+        <option selected>none</option>
+        <option value="egs">Epic Game Store</option>
+        <option value="gog">GOG Games</option>
+        <option value="battlenet">BattleNet</option>
+        <option value="amazon">Amazon</option>
+        <option value="humble">Humble</option>
+        <option value="itchio">Itchio</option>
+        <option value="ubisoft">Ubisoft</option>
+      </select>
+    </div>
     <button type="submit" class="btn btn-primary">Done</button>
   </form>
 </div>
 
+<script type="text/javascript" src="/assets/js/create.js"></script>
 {{end}}

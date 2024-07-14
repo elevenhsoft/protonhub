@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"net/http"
+	"strings"
 )
 
 var tmpl = make(map[string]*template.Template)
@@ -24,20 +24,33 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateDoneHandler(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseMultipartForm(10 << 20)
-
-	if err != nil {
-		http.Error(w, "Unable to parse form", http.StatusBadRequest)
-		return
-	}
+	var launcherArgs []string
 
 	name := r.FormValue("launcherName")
-	icon, handler, err := r.FormFile("launcherIcon")
+	proton := r.FormValue("protonPath")
+	prefix := r.FormValue("prefixPath")
+	exe := r.FormValue("launcherPathExe")
+	gameId := r.FormValue("launcherGameId")
+	store := r.FormValue("launcherGameStore")
+	args := r.FormValue("launcherExeArgs")
 
-	if err != nil {
-		http.Error(w, "Error parsing file", http.StatusBadRequest)
-		return
+	for _, split := range strings.Split(args, ",") {
+		arg := strings.TrimSpace(split)
+		launcherArgs = append(launcherArgs, arg)
 	}
 
-	fmt.Println(name, icon, handler)
+	obj := umu{
+		Prefix:     prefix,
+		Proton:     proton,
+		GameID:     gameId,
+		Exe:        exe,
+		LaunchArgs: launcherArgs,
+		Store:      store,
+	}
+
+	config_file := toTomlFileName(name)
+
+	createTomlConfig(config_file, obj)
+
+	http.Redirect(w, r, "/", 200)
 }
