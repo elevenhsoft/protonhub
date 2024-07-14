@@ -10,7 +10,6 @@ var tmpl = make(map[string]*template.Template)
 
 func tmplCache() map[string]*template.Template {
 	tmpl["index"] = template.Must(template.ParseFiles("./static/index.html", "./static/base.html"))
-
 	tmpl["create"] = template.Must(template.ParseFiles("./static/create.html", "./static/base.html"))
 
 	return tmpl
