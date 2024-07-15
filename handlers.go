@@ -51,6 +51,8 @@ func CreateDoneHandler(w http.ResponseWriter, r *http.Request) {
 	config_file := toTomlFileName(name)
 
 	createTomlConfig(config_file, obj)
+	conn := DbConnection()
+	AddLauncherToDb(conn, name, args, obj)
 
-	http.Redirect(w, r, "/", 200)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
