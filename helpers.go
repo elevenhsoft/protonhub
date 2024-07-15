@@ -12,6 +12,17 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+func ParseLauncherArgs(args string) []string {
+	var launcherArgs []string
+
+	for _, split := range strings.Split(args, ",") {
+		arg := strings.TrimSpace(split)
+		launcherArgs = append(launcherArgs, arg)
+	}
+
+	return launcherArgs
+}
+
 type umu struct {
 	Prefix     string   `toml:"prefix"`
 	Proton     string   `toml:"proton"`

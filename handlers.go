@@ -3,7 +3,6 @@ package main
 import (
 	"html/template"
 	"net/http"
-	"strings"
 )
 
 var tmpl = make(map[string]*template.Template)
@@ -24,8 +23,6 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateDoneHandler(w http.ResponseWriter, r *http.Request) {
-	var launcherArgs []string
-
 	name := r.FormValue("launcherName")
 	proton := r.FormValue("protonPath")
 	prefix := r.FormValue("prefixPath")
@@ -34,17 +31,12 @@ func CreateDoneHandler(w http.ResponseWriter, r *http.Request) {
 	store := r.FormValue("launcherGameStore")
 	args := r.FormValue("launcherExeArgs")
 
-	for _, split := range strings.Split(args, ",") {
-		arg := strings.TrimSpace(split)
-		launcherArgs = append(launcherArgs, arg)
-	}
-
 	obj := umu{
 		Prefix:     prefix,
 		Proton:     proton,
 		GameID:     gameId,
 		Exe:        exe,
-		LaunchArgs: launcherArgs,
+		LaunchArgs: ParseLauncherArgs(args),
 		Store:      store,
 	}
 
