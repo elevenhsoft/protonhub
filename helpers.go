@@ -23,6 +23,20 @@ func ParseLauncherArgs(args string) []string {
 	return launcherArgs
 }
 
+func UnParseLauncherArgs(args []string) string {
+	var result string
+
+	for _, arg := range args {
+		if len(args) > 1 {
+			result += arg + ", "
+		} else {
+			result += arg
+		}
+	}
+
+	return result
+}
+
 type Launcher struct {
 	Config     string
 	Name       string

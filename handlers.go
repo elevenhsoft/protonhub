@@ -12,7 +12,14 @@ import (
 var tmpl = make(map[string]*template.Template)
 
 func tmplCache() map[string]*template.Template {
+	editFunc := template.FuncMap{
+		"unparseArgs": UnParseLauncherArgs,
+	}
+
+	editTpl, editErr := template.New("./static/edit.html").Funcs(editFunc).ParseFiles("./static/edit.html", "./static/base.html")
+
 	tmpl["index"] = template.Must(template.ParseFiles("./static/index.html", "./static/base.html"))
+	tmpl["edit"] = template.Must(editTpl, editErr)
 	tmpl["create"] = template.Must(template.ParseFiles("./static/create.html", "./static/base.html"))
 
 	return tmpl
@@ -85,4 +92,13 @@ func RunHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func EditHandler(w http.ResponseWriter, r *http.Request) {
+	gameId := r.PathValue("gameId")
+
+	conn := DbConnection()
+	launcher := GetLauncherByIdFromDb(conn, gameId)
+
+	tmplCache()["edit"].ExecuteTemplate(w, "base", launcher)
 }

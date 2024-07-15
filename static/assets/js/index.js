@@ -1,4 +1,5 @@
 let launcherBtn = document.getElementById("launcher");
+let editBtn = document.getElementById("edit");
 
 async function runFetch(gameId) {
   const response = await fetch("/run", {
@@ -21,4 +22,10 @@ launcherBtn.addEventListener("click", async () => {
     launcherBtn.textContent = "Launch";
     launcherBtn.removeAttribute("disabled");
   }
+});
+
+editBtn.addEventListener("click", () => {
+  gameId = editBtn.dataset.gameId;
+
+  window.location.href = `/edit/${gameId}`;
 });
