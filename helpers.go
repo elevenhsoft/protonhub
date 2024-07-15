@@ -90,6 +90,34 @@ func createTomlConfig(s string, data umu) {
 	file.WriteString(final_toml)
 }
 
+func updateTomlFile(s string, data umu) {
+	final_path := filepath.Join(phStorePath(), "configs", s)
+
+	err := os.Remove(final_path)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	writer := new(bytes.Buffer)
+
+	err = toml.NewEncoder(writer).Encode(data)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	final_toml := fmt.Sprintf("[umu]\n%s", writer.String())
+
+	file, err := os.Create(final_path)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	file.WriteString(final_toml)
+}
+
 func GetConfigPath(cfg string) string {
 	return filepath.Join(phStorePath(), "configs", cfg)
 }

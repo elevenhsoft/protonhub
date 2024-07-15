@@ -136,3 +136,11 @@ SELECT config, name, prefix, proton, game_id, exefile, args, store FROM launcher
 
 	return launcher
 }
+
+func UpdateLauncherInDb(conn *sql.DB, config, name, args string, launcher umu) {
+	sql := `
+UPDATE launchers SET name = ?, prefix = ?, proton = ?, game_id = ?, exefile = ?, args = ?, store = ?  WHERE config = ?
+	`
+	conn.Exec(sql, name, launcher.Prefix, launcher.Proton, launcher.GameID, launcher.Exe, args, launcher.Store, config)
+	defer conn.Close()
+}
