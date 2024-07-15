@@ -27,13 +27,40 @@
           >
             Launch
           </button>
-          <button
-            id="edit"
-            class="btn btn-primary"
-            data-game-id="{{ .GameID }}"
-          >
-            Edit
-          </button>
+          <div class="btn-group">
+            <button
+              type="button"
+              class="btn btn-primary dropdown-toggle"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Manage
+            </button>
+            <ul class="dropdown-menu">
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="#"
+                  id="edit"
+                  data-game-id="{{ .GameID }}"
+                  >Edit</a
+                >
+              </li>
+              <li>
+                <a
+                  id="winetricks"
+                  class="dropdown-item"
+                  href="#"
+                  data-game-id="{{ .GameID }}"
+                  data-bs-toggle="modal"
+                  data-bs-target="#winetricksModal"
+                  >Winetricks</a
+                >
+              </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li><a class="dropdown-item" href="#">Delete</a></li>
+            </ul>
+          </div>
         </td>
         <td>{{ .Name }}</td>
         <td>{{ .Prefix }}</td>
@@ -46,6 +73,60 @@
       {{end}}
     </tbody>
   </table>
+</div>
+
+<div
+  class="modal fade"
+  id="winetricksModal"
+  tabindex="-1"
+  aria-labelledby="winetricksModal"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="winetricksModalTitle">
+          Winetricks verbs prompt
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <p>Put your winetricks verbs below. Separate each verb with space.</p>
+        </div>
+        <div class="row">
+          <div class="input-group mb-3">
+            <span class="input-group-text">winetricks</span>
+            <input
+              type="text"
+              class="form-control"
+              id="winetricksVerbs"
+              placeholder="dotnet40 dotnet48 vcrun2019"
+            />
+          </div>
+        </div>
+        <div class="row">
+          <div class="mb-3">
+            <label for="commandLogs" class="form-label">Command logs</label>
+            <textarea class="form-control" id="commandLogs" rows="6"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+        <button type="button" class="btn btn-primary" id="winetricksVerbsSave">
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="assets/js/index.js"></script>

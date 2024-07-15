@@ -2,11 +2,14 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"os/exec"
+	"strings"
 )
 
 var tmpl = make(map[string]*template.Template)
@@ -92,6 +95,57 @@ func RunHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+type RunWinetricksHandlerObject struct {
+	GameID string `json:"gameId"`
+	Verbs  string `json:"verbs"`
+}
+
+type WinetricksLogResponse struct {
+	Log string `json:"log"`
+}
+
+func RunWinetricksHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var obj RunWinetricksHandlerObject
+	err = json.Unmarshal(body, &obj)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	conn := DbConnection()
+	launcher := GetLauncherByIdFromDb(conn, obj.GameID)
+
+	var verbs []string
+	verbs = append(verbs, "winetricks")
+	for _, arg := range strings.Split(obj.Verbs, " ") {
+		verbs = append(verbs, arg)
+	}
+
+	gameidEnv := fmt.Sprintf("GAMEID=%s", launcher.GameID)
+	protonpathEnv := fmt.Sprintf("PROTONPATH=%s", launcher.Proton)
+
+	cmd := exec.Command("umu-run", verbs...)
+	cmd.Env = os.Environ()
+	cmd.Env = append(cmd.Env, gameidEnv, protonpathEnv)
+
+	out, _ := cmd.CombinedOutput()
+
+	response := WinetricksLogResponse{Log: fmt.Sprintf("%s", string(out))}
+	resp_log, err := json.Marshal(response)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(resp_log)
+	w.(http.Flusher).Flush()
 }
 
 func EditHandler(w http.ResponseWriter, r *http.Request) {
