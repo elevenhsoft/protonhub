@@ -23,6 +23,17 @@ func ParseLauncherArgs(args string) []string {
 	return launcherArgs
 }
 
+type Launcher struct {
+	Config     string
+	Name       string
+	Prefix     string
+	Proton     string
+	GameID     string
+	Exe        string
+	LaunchArgs []string
+	Store      string
+}
+
 type umu struct {
 	Prefix     string   `toml:"prefix"`
 	Proton     string   `toml:"proton"`
@@ -63,6 +74,10 @@ func createTomlConfig(s string, data umu) {
 	}
 
 	file.WriteString(final_toml)
+}
+
+func GetConfigPath(cfg string) string {
+	return filepath.Join(phStorePath(), "configs", cfg)
 }
 
 func homePath() string {

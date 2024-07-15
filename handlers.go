@@ -1,8 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"html/template"
+	"io"
+	"log"
 	"net/http"
+	"os/exec"
 )
 
 var tmpl = make(map[string]*template.Template)
@@ -15,7 +19,10 @@ func tmplCache() map[string]*template.Template {
 }
 
 func RootHandler(w http.ResponseWriter, r *http.Request) {
-	tmplCache()["index"].ExecuteTemplate(w, "base", nil)
+	conn := DbConnection()
+	launchers := GetLaunchersFromDb(conn)
+
+	tmplCache()["index"].ExecuteTemplate(w, "base", launchers)
 }
 
 func CreateHandler(w http.ResponseWriter, r *http.Request) {
@@ -44,7 +51,38 @@ func CreateDoneHandler(w http.ResponseWriter, r *http.Request) {
 
 	createTomlConfig(config_file, obj)
 	conn := DbConnection()
-	AddLauncherToDb(conn, name, args, obj)
+	AddLauncherToDb(conn, config_file, name, args, obj)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+type RunHandlerObject struct {
+	GameID string `json:"gameId"`
+}
+
+func RunHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var obj RunHandlerObject
+	err = json.Unmarshal(body, &obj)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	conn := DbConnection()
+	launcher := GetLauncherByIdFromDb(conn, obj.GameID).Config
+	config := GetConfigPath(launcher)
+
+	cmd := exec.Command("umu-run", "--config", config)
+	_, err = cmd.Output()
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Fatal(err)
+	}
+
+	w.WriteHeader(http.StatusOK)
 }

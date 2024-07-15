@@ -22,7 +22,7 @@ func DbConnection() *sql.DB {
 func LaunchersTableInit(conn *sql.DB) {
 	sql := `
 CREATE TABLE IF NOT EXISTS launchers (
-	id integer not null primary key,
+	config text not null primary key,
 	name text,
 	prefix text,
 	proton text,
@@ -35,13 +35,13 @@ CREATE TABLE IF NOT EXISTS launchers (
 	defer conn.Close()
 }
 
-func AddLauncherToDb(conn *sql.DB, name, args string, launcher umu) {
+func AddLauncherToDb(conn *sql.DB, config, name, args string, launcher umu) {
 	tx, err := conn.Begin()
 	if err != nil {
 		log.Fatal(err)
 	}
 	sql := `
-INSERT INTO launchers(name, prefix, proton, game_id, exefile, args, store) values (?, ?, ?, ?, ?, ?, ?)
+INSERT INTO launchers(config, name, prefix, proton, game_id, exefile, args, store) values (?, ?, ?, ?, ?, ?, ?, ?)
 	`
 	stmt, err := tx.Prepare(sql)
 	if err != nil {
@@ -49,6 +49,90 @@ INSERT INTO launchers(name, prefix, proton, game_id, exefile, args, store) value
 	}
 	defer stmt.Close()
 
-	stmt.Exec(name, launcher.Prefix, launcher.Proton, launcher.GameID, launcher.Exe, args, launcher.Store)
+	stmt.Exec(config, name, launcher.Prefix, launcher.Proton, launcher.GameID, launcher.Exe, args, launcher.Store)
 	tx.Commit()
+}
+
+func GetLaunchersFromDb(conn *sql.DB) []Launcher {
+	sql := `
+SELECT config, name, prefix, proton, game_id, exefile, args, store FROM launchers 
+	`
+	rows, err := conn.Query(sql)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var launchers []Launcher
+
+	for rows.Next() {
+		var config string
+		var name string
+		var prefix string
+		var proton string
+		var game_id string
+		var exefile string
+		var args string
+		var store string
+
+		err = rows.Scan(&config, &name, &prefix, &proton, &game_id, &exefile, &args, &store)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		launchers = append(launchers, Launcher{
+			Config:     config,
+			Name:       name,
+			Prefix:     prefix,
+			Proton:     proton,
+			GameID:     game_id,
+			Exe:        exefile,
+			LaunchArgs: ParseLauncherArgs(args),
+			Store:      store,
+		})
+	}
+
+	return launchers
+}
+
+func GetLauncherByIdFromDb(conn *sql.DB, gameId string) Launcher {
+	sql := `
+SELECT config, name, prefix, proton, game_id, exefile, args, store FROM launchers WHERE game_id = ?
+	`
+	rows, err := conn.Query(sql, gameId)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var launcher Launcher
+
+	for rows.Next() {
+		var config string
+		var name string
+		var prefix string
+		var proton string
+		var game_id string
+		var exefile string
+		var args string
+		var store string
+
+		err = rows.Scan(&config, &name, &prefix, &proton, &game_id, &exefile, &args, &store)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		launcher = Launcher{
+			Config:     config,
+			Name:       name,
+			Prefix:     prefix,
+			Proton:     proton,
+			GameID:     game_id,
+			Exe:        exefile,
+			LaunchArgs: ParseLauncherArgs(args),
+			Store:      store,
+		}
+	}
+
+	return launcher
 }

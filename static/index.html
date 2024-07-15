@@ -1,5 +1,45 @@
 {{define "head"}}
 <title>ProtonHub :: Index</title>
 {{end}} {{define "body"}}
-<h1>Hello World</h1>
+<h1>Launchers</h1>
+<div class="row m-3">
+  <table class="table table-striped-columns">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Prefix</th>
+        <th scope="col">Proton</th>
+        <th scope="col">Exe</th>
+        <th scope="col">Arguments</th>
+        <th scope="col">Store</th>
+        <th scope="col">Game ID</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range .}}
+      <tr>
+        <td scope="row">
+          <button
+            id="launcher"
+            class="btn btn-success"
+            data-game-id="{{ .GameID }}"
+          >
+            Launch
+          </button>
+        </td>
+        <td>{{ .Name }}</td>
+        <td>{{ .Prefix }}</td>
+        <td>{{ .Proton }}</td>
+        <td>{{ .Exe }}</td>
+        <td>{{ .LaunchArgs }}</td>
+        <td>{{ .Store }}</td>
+        <td>{{ .GameID }}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+
+<script src="assets/js/index.js"></script>
 {{end}}
