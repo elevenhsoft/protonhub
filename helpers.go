@@ -45,7 +45,7 @@ func toTomlFileName(s string) string {
 }
 
 func createTomlConfig(s string, data umu) {
-	final_path := filepath.Join(phStorePath(), s)
+	final_path := filepath.Join(phStorePath(), "configs", s)
 	writer := new(bytes.Buffer)
 
 	err := toml.NewEncoder(writer).Encode(data)
@@ -56,7 +56,6 @@ func createTomlConfig(s string, data umu) {
 
 	final_toml := fmt.Sprintf("[umu]\n%s", writer.String())
 
-	initStore()
 	file, err := os.Create(final_path)
 
 	if err != nil {
@@ -75,9 +74,11 @@ func phStorePath() string {
 }
 
 func initStore() {
-	_, err := os.Stat(phStorePath())
+	path := filepath.Join(phStorePath(), "configs")
+	_, err := os.Stat(path)
 
 	if os.IsNotExist(err) {
-		os.MkdirAll(phStorePath(), 0755)
+		os.MkdirAll(path, 0755)
 	}
+
 }

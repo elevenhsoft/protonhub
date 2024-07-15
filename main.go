@@ -10,6 +10,8 @@ const IP = "127.0.0.1"
 const PORT = "8080"
 
 func main() {
+	// initalize store directory
+	initStore()
 	// initalize database
 	conn := DbConnection()
 	LaunchersTableInit(conn)
