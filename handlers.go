@@ -99,11 +99,6 @@ func RunHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-type RunWinetricksHandlerObject struct {
-	GameID string `json:"gameId"`
-	Verbs  string `json:"verbs"`
-}
-
 func RunWinetricksHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
