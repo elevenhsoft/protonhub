@@ -145,7 +145,6 @@ func RunWinetricksHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(resp_log)
-	w.(http.Flusher).Flush()
 }
 
 func EditHandler(w http.ResponseWriter, r *http.Request) {
