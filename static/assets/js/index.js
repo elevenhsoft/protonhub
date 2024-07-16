@@ -1,12 +1,12 @@
-let launcherBtn = document.getElementById("launcher");
+let launcherBtn = document.querySelectorAll("#launcher");
 let launcherLogsClear = document.getElementById("launcherLogsClear");
-let editBtn = document.getElementById("edit");
+let editBtn = document.querySelectorAll("#edit");
 let winetricksBtn = document.getElementById("winetricks");
 let winetricksVerbs = document.getElementById("winetricksVerbs");
 let winetricksLogsClear = document.getElementById("winetricksLogsClear");
 let saveWinetricksVerb = document.getElementById("winetricksVerbsSave");
 
-async function runFetch(gameId) {
+async function runFetch(gameId, ele) {
   if (gameId) {
     let eventSource = new EventSource(`/run/${gameId}`);
 
@@ -20,8 +20,8 @@ async function runFetch(gameId) {
 
       if (event.data == "0") {
         eventSource.close();
-        launcherBtn.textContent = "Launch";
-        launcherBtn.removeAttribute("disabled");
+        ele.textContent = "Launch";
+        ele.removeAttribute("disabled");
       }
     };
   }
@@ -49,23 +49,27 @@ async function runWinetricks(gameId, verbs) {
   }
 }
 
-launcherBtn.addEventListener("click", async () => {
-  launcherBtn.textContent = "Process is running...";
-  launcherBtn.setAttribute("disabled", true);
+launcherBtn.forEach((ele, _) => {
+  ele.addEventListener("click", async () => {
+    ele.textContent = "Process is running...";
+    ele.setAttribute("disabled", true);
 
-  let gameId = launcherBtn.dataset.gameId;
+    let gameId = ele.dataset.gameId;
 
-  await runFetch(gameId);
+    await runFetch(gameId, ele);
+  });
 });
 
 launcherLogsClear.addEventListener("click", () => {
   document.getElementById("launcherLogging").value = "";
 });
 
-editBtn.addEventListener("click", () => {
-  gameId = editBtn.dataset.gameId;
+editBtn.forEach((ele, _) => {
+  ele.addEventListener("click", () => {
+    gameId = ele.dataset.gameId;
 
-  window.location.href = `/edit/${gameId}`;
+    window.location.href = `/edit/${gameId}`;
+  });
 });
 
 saveWinetricksVerb.addEventListener("click", async () => {
