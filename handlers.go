@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bufio"
+	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -102,28 +104,20 @@ type RunWinetricksHandlerObject struct {
 	Verbs  string `json:"verbs"`
 }
 
-type WinetricksLogResponse struct {
-	Log string `json:"log"`
-}
-
 func RunWinetricksHandler(w http.ResponseWriter, r *http.Request) {
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+	w.Header().Set("Content-Type", "text/event-stream")
 
-	var obj RunWinetricksHandlerObject
-	err = json.Unmarshal(body, &obj)
-	if err != nil {
-		log.Fatal(err)
-	}
+	gameId := r.PathValue("gameId")
+	verbs_get := r.PathValue("verbs")
 
 	conn := DbConnection()
-	launcher := GetLauncherByIdFromDb(conn, obj.GameID)
+	launcher := GetLauncherByIdFromDb(conn, gameId)
 
 	var verbs []string
 	verbs = append(verbs, "winetricks")
-	for _, arg := range strings.Split(obj.Verbs, " ") {
+	for _, arg := range strings.Split(verbs_get, " ") {
 		verbs = append(verbs, arg)
 	}
 
@@ -134,17 +128,62 @@ func RunWinetricksHandler(w http.ResponseWriter, r *http.Request) {
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, gameidEnv, protonpathEnv)
 
-	out, _ := cmd.CombinedOutput()
-
-	response := WinetricksLogResponse{Log: fmt.Sprintf("%s", string(out))}
-	resp_log, err := json.Marshal(response)
+	stdout, err := cmd.StdoutPipe()
+	cmd.Stderr = cmd.Stdout
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(resp_log)
+	dataCh := make(chan string)
+
+	// Create a context for handling client disconnection
+	_, cancel := context.WithCancel(r.Context())
+	defer cancel()
+
+	go func() {
+		for data := range dataCh {
+			fmt.Fprintf(w, "data: %s\n\n", data)
+			w.(http.Flusher).Flush()
+		}
+	}()
+
+	// Create a scanner which scans r in a line-by-line fashion
+	scanner := bufio.NewScanner(stdout)
+
+	// Use the scanner to scan the output line by line and log it
+
+	// It's running in a goroutine so that it doesn't block
+
+	fmt.Printf("Command executed: %s\n", cmd)
+
+	go func() {
+
+		// Read line by line and process it
+		for scanner.Scan() {
+			line := scanner.Text()
+
+			fmt.Println(line)
+
+			if line != "" {
+				dataCh <- line
+			}
+		}
+
+		dataCh <- "0"
+
+	}()
+
+	// Start the command and check for errors
+
+	err = cmd.Start()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_ = cmd.Wait()
+
 }
 
 func EditHandler(w http.ResponseWriter, r *http.Request) {

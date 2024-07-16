@@ -14,21 +14,24 @@ async function runFetch(gameId) {
 }
 
 async function runWinetricks(gameId, verbs) {
-  try {
-    const response = await fetch("/winetricks", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ gameId: gameId, verbs: verbs }),
-    });
-    if (!response.ok) {
-      throw new Error("Network response was not ok " + response.statusText);
-    }
+  if (gameId && verbs) {
+    let eventSource = new EventSource(`/winetricks/${gameId}/${verbs}`);
 
-    return await response.json();
-  } catch (e) {
-    console.error(e);
+    eventSource.onmessage = (event) => {
+      let logger = document.getElementById("commandLogs");
+
+      if (event.data != "0") {
+        logger.value += `${event.data}\n`;
+      }
+
+      if (event.data == "0") {
+        eventSource.close()
+        winetricksBtn.innerText = "Winetricks";
+        saveWinetricksVerb.innerText = "Save";
+        saveWinetricksVerb.removeAttribute("disabled");
+      }
+    };
+
   }
 }
 
@@ -52,21 +55,15 @@ editBtn.addEventListener("click", () => {
   window.location.href = `/edit/${gameId}`;
 });
 
-saveWinetricksVerb.addEventListener("click", async (e) => {
-  e.preventDefault();
-
-  winetricksBtn.innerText = "Process is running...";
-  saveWinetricksVerb.innerText = "Process is running...";
-  saveWinetricksVerb.setAttribute("disabled", true);
-
+saveWinetricksVerb.addEventListener("click", async () => {
   let gameId = winetricksBtn.dataset.gameId;
   let verbs = winetricksVerbs.value;
 
-  let logs = await runWinetricks(gameId, verbs);
+  if (gameId && verbs) {
+    winetricksBtn.innerText = "Process is running...";
+    saveWinetricksVerb.innerText = "Process is running...";
+    saveWinetricksVerb.setAttribute("disabled", true);
+  }
 
-  let logger = document.getElementById("commandLogs");
-  logger.value = logs["log"];
-  winetricksBtn.innerText = "Winetricks";
-  saveWinetricksVerb.innerText = "Save";
-  saveWinetricksVerb.removeAttribute("disabled");
+  await runWinetricks(gameId, verbs);
 });

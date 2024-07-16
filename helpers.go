@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"log"
@@ -11,6 +12,17 @@ import (
 
 	"github.com/BurntSushi/toml"
 )
+
+func readStuff(scanner *bufio.Scanner, message chan string, stop chan bool) {
+	for scanner.Scan() {
+		message <- "Permormed scan start"
+		message <- scanner.Text()
+	}
+	if err := scanner.Err(); err != nil {
+		message <- fmt.Sprintf("%s", err)
+	}
+	stop <- true
+}
 
 func ParseLauncherArgs(args string) []string {
 	var launcherArgs []string
