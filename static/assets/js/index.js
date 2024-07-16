@@ -1,7 +1,9 @@
 let launcherBtn = document.getElementById("launcher");
+let launcherLogsClear = document.getElementById("launcherLogsClear");
 let editBtn = document.getElementById("edit");
 let winetricksBtn = document.getElementById("winetricks");
 let winetricksVerbs = document.getElementById("winetricksVerbs");
+let winetricksLogsClear = document.getElementById("winetricksLogsClear");
 let saveWinetricksVerb = document.getElementById("winetricksVerbsSave");
 
 async function runFetch(gameId) {
@@ -59,6 +61,11 @@ launcherBtn.addEventListener("click", async () => {
 
 });
 
+
+launcherLogsClear.addEventListener("click", () => {
+  document.getElementById("launcherLogging").value = "";
+});
+
 editBtn.addEventListener("click", () => {
   gameId = editBtn.dataset.gameId;
 
@@ -76,4 +83,8 @@ saveWinetricksVerb.addEventListener("click", async () => {
   }
 
   await runWinetricks(gameId, verbs);
+});
+
+winetricksLogsClear.addEventListener("click", () => {
+  document.getElementById("commandLogs").value = "";
 });

@@ -114,6 +114,9 @@
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
           Close
         </button>
+        <button type="button" class="btn btn-danger" id="launcherLogsClear">
+          Clear
+        </button>
       </div>
     </div>
   </div>
@@ -141,7 +144,7 @@
       </div>
       <div class="modal-body">
         <div class="row">
-          <p>Put your winetricks verbs below. Separate each verb with space.</p>
+          <p>Put your winetricks verbs below. Separate each verb with space. List of allowed verbs here: <a href="https://github.com/Open-Wine-Components/umu-launcher/blob/main/tests/testdata/winetricks_verbs.txt">winetricks_verbs.txt</a></p>
         </div>
         <div class="row">
           <div class="input-group mb-3">
@@ -157,13 +160,16 @@
         <div class="row">
           <div class="mb-3">
             <label for="commandLogs" class="form-label">Command logs</label>
-            <textarea class="form-control" id="commandLogs" rows="26" disabled></textarea>
+            <textarea class="form-control" id="commandLogs" rows="22" disabled></textarea>
           </div>
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
           Close
+        </button>
+        <button type="button" class="btn btn-danger" id="winetricksLogsClear">
+          Clear
         </button>
         <button type="button" class="btn btn-primary" id="winetricksVerbsSave">
           Save
