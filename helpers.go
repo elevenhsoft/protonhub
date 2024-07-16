@@ -1,27 +1,24 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"log"
 	"math/rand"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/BurntSushi/toml"
 )
 
-func readStuff(scanner *bufio.Scanner, message chan string, stop chan bool) {
-	for scanner.Scan() {
-		message <- "Permormed scan start"
-		message <- scanner.Text()
-	}
-	if err := scanner.Err(); err != nil {
-		message <- fmt.Sprintf("%s", err)
-	}
-	stop <- true
+const ansi = "[\u001B\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntqry=><~]))"
+
+var re = regexp.MustCompile(ansi)
+
+func Strip(str string) string {
+	return re.ReplaceAllString(str, "")
 }
 
 func ParseLauncherArgs(args string) []string {

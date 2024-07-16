@@ -155,8 +155,6 @@ func RunWinetricksHandler(w http.ResponseWriter, r *http.Request) {
 
 	// It's running in a goroutine so that it doesn't block
 
-	fmt.Printf("Command executed: %s\n", cmd)
-
 	go func() {
 
 		// Read line by line and process it
@@ -166,7 +164,7 @@ func RunWinetricksHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(line)
 
 			if line != "" {
-				dataCh <- line
+				dataCh <- Strip(line)
 			}
 		}
 
