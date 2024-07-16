@@ -19,12 +19,11 @@ async function runFetch(gameId) {
       }
 
       if (event.data == "0") {
-        eventSource.close()
+        eventSource.close();
         launcherBtn.textContent = "Launch";
         launcherBtn.removeAttribute("disabled");
       }
     };
-
   }
 }
 
@@ -41,13 +40,12 @@ async function runWinetricks(gameId, verbs) {
       }
 
       if (event.data == "0") {
-        eventSource.close()
+        eventSource.close();
         winetricksBtn.innerText = "Winetricks";
         saveWinetricksVerb.innerText = "Save";
         saveWinetricksVerb.removeAttribute("disabled");
       }
     };
-
   }
 }
 
@@ -58,9 +56,7 @@ launcherBtn.addEventListener("click", async () => {
   let gameId = launcherBtn.dataset.gameId;
 
   await runFetch(gameId);
-
 });
-
 
 launcherLogsClear.addEventListener("click", () => {
   document.getElementById("launcherLogging").value = "";
