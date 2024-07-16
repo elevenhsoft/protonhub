@@ -20,13 +20,22 @@
       {{ range .}}
       <tr>
         <td scope="row">
-          <button
-            id="launcher"
-            class="btn btn-success"
-            data-game-id="{{ .GameID }}"
-          >
-            Launch
-          </button>
+          <div class="btn-group">
+            <button
+              id="launcher"
+              class="btn btn-success"
+              data-game-id="{{ .GameID }}"
+            >
+              Launch
+            </button>
+            <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="visually-hidden">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Stop</a></li>
+              <li><a class="dropdown-item" href="#">Logs</a></li>
+            </ul>
+          </div>
           <div class="btn-group">
             <button
               type="button"
