@@ -5,12 +5,25 @@ let winetricksVerbs = document.getElementById("winetricksVerbs");
 let saveWinetricksVerb = document.getElementById("winetricksVerbsSave");
 
 async function runFetch(gameId) {
-  const response = await fetch("/run", {
-    method: "POST",
-    body: JSON.stringify({ gameId: gameId }),
-  });
+  if (gameId) {
+    let eventSource = new EventSource(`/run/${gameId}`);
 
-  return response.status;
+    eventSource.onmessage = (event) => {
+      let logger = document.getElementById("launcherLogging");
+      logger.scrollTop = logger.scrollHeight;
+
+      if (event.data != "0") {
+        logger.value += `${event.data}\n`;
+      }
+
+      if (event.data == "0") {
+        eventSource.close()
+        launcherBtn.textContent = "Launch";
+        launcherBtn.removeAttribute("disabled");
+      }
+    };
+
+  }
 }
 
 async function runWinetricks(gameId, verbs) {
@@ -19,6 +32,7 @@ async function runWinetricks(gameId, verbs) {
 
     eventSource.onmessage = (event) => {
       let logger = document.getElementById("commandLogs");
+      logger.scrollTop = logger.scrollHeight;
 
       if (event.data != "0") {
         logger.value += `${event.data}\n`;
@@ -41,12 +55,8 @@ launcherBtn.addEventListener("click", async () => {
 
   let gameId = launcherBtn.dataset.gameId;
 
-  let status = await runFetch(gameId);
+  await runFetch(gameId);
 
-  if (status === 200) {
-    launcherBtn.textContent = "Launch";
-    launcherBtn.removeAttribute("disabled");
-  }
 });
 
 editBtn.addEventListener("click", () => {

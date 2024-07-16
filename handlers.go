@@ -3,10 +3,8 @@ package main
 import (
 	"bufio"
 	"context"
-	"encoding/json"
 	"fmt"
 	"html/template"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -68,35 +66,70 @@ func CreateDoneHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-type RunHandlerObject struct {
-	GameID string `json:"gameId"`
-}
-
 func RunHandler(w http.ResponseWriter, r *http.Request) {
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+	w.Header().Set("Content-Type", "text/event-stream")
 
-	var obj RunHandlerObject
-	err = json.Unmarshal(body, &obj)
-	if err != nil {
-		log.Fatal(err)
-	}
+	gameId := r.PathValue("gameId")
 
 	conn := DbConnection()
-	launcher := GetLauncherByIdFromDb(conn, obj.GameID).Config
+	launcher := GetLauncherByIdFromDb(conn, gameId).Config
 	config := GetConfigPath(launcher)
 
 	cmd := exec.Command("umu-run", "--config", config)
-	_, err = cmd.Output()
+	stdout, err := cmd.StdoutPipe()
+	cmd.Stderr = cmd.Stdout
 
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
 		log.Fatal(err)
 	}
 
-	w.WriteHeader(http.StatusOK)
+	dataCh := make(chan string)
+
+	// Create a context for handling client disconnection
+	_, cancel := context.WithCancel(r.Context())
+	defer cancel()
+
+	go func() {
+		for data := range dataCh {
+			fmt.Fprintf(w, "data: %s\n\n", data)
+			w.(http.Flusher).Flush()
+		}
+	}()
+
+	// Create a scanner which scans r in a line-by-line fashion
+	scanner := bufio.NewScanner(stdout)
+
+	// Use the scanner to scan the output line by line and log it
+
+	// It's running in a goroutine so that it doesn't block
+
+	go func() {
+
+		// Read line by line and process it
+		for scanner.Scan() {
+			line := scanner.Text()
+
+			fmt.Println(line)
+
+			if line != "" {
+				dataCh <- Strip(line)
+			}
+		}
+
+		dataCh <- "0"
+
+	}()
+
+	// Start the command and check for errors
+	err = cmd.Start()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_ = cmd.Wait()
 }
 
 func RunWinetricksHandler(w http.ResponseWriter, r *http.Request) {
