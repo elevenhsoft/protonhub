@@ -158,6 +158,18 @@ func ListRunningGameIds() []string {
 	return locks
 }
 
+func CheckLockfileForProcess(gameId string) bool {
+	path := GetLockfilePath(gameId)
+
+	_, err := os.Stat(path)
+
+	if os.IsNotExist(err) {
+		return true
+	}
+
+	return false
+}
+
 func CreateLockfileForProcess(gameId string, pid int) bool {
 	path := GetLockfilePath(gameId)
 
@@ -273,16 +285,20 @@ func CmdToResponse(gameId string, cmd *exec.Cmd, w http.ResponseWriter) {
 		log.Fatal(err)
 	}
 
+	var pgid int
+
 	// Start the command and check for errors
-	err = cmd.Start()
+	if CheckLockfileForProcess(gameId) {
+		err = cmd.Start()
 
-	if err != nil {
-		log.Fatal(err)
-	}
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	pgid, err := syscall.Getpgid(cmd.Process.Pid)
-	if err != nil {
-		log.Fatal(err)
+		pgid, err = syscall.Getpgid(cmd.Process.Pid)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	dataCh := make(chan string)
@@ -310,15 +326,16 @@ func CmdToResponse(gameId string, cmd *exec.Cmd, w http.ResponseWriter) {
 			line := scanner.Text()
 
 			fmt.Println(line)
-
-			if line != "" {
-				dataCh <- StripANSI(line)
-			}
-		}
-		if RemoveLockfileForProcess(gameId) {
-			dataCh <- fmt.Sprintf("[exit: 0] removing lockfile for pgid: %d", pgid)
+			dataCh <- StripANSI(line)
 		}
 	}()
 
-	_ = cmd.Wait()
+	err = cmd.Wait()
+
+	if err == nil {
+		if RemoveLockfileForProcess(gameId) {
+			fmt.Fprintf(w, "data: [exit: 0] removing lockfile for pgid: %d\n\n", pgid)
+			w.(http.Flusher).Flush()
+		}
+	}
 }
