@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
-	"io"
 	"net/http"
 	"os"
 	"os/exec"
@@ -83,48 +82,7 @@ func RunHandler(w http.ResponseWriter, r *http.Request) {
 	_, cancel := context.WithCancel(r.Context())
 	defer cancel()
 
-	CmdToResponse(cmd, w)
-}
-
-type ProcessLockObject struct {
-	Pid    string `json:"pid"`
-	GameID string `json:"gameid"`
-}
-
-func CreateProcessLockHandler(w http.ResponseWriter, r *http.Request) {
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	defer r.Body.Close()
-
-	var obj ProcessLockObject
-	err = json.Unmarshal(body, &obj)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	CreateLockfileForProcess(obj.GameID, obj.Pid)
-}
-
-func RemoveProcessLockHandler(w http.ResponseWriter, r *http.Request) {
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	defer r.Body.Close()
-
-	var obj ProcessLockObject
-	err = json.Unmarshal(body, &obj)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	RemoveLockfileForProcess(obj.GameID)
+	CmdToResponse(gameId, cmd, w)
 }
 
 func StopProcessHandler(w http.ResponseWriter, r *http.Request) {
@@ -179,7 +137,7 @@ func RunWinetricksHandler(w http.ResponseWriter, r *http.Request) {
 	_, cancel := context.WithCancel(r.Context())
 	defer cancel()
 
-	CmdToResponse(cmd, w)
+	CmdToResponse(gameId, cmd, w)
 }
 
 func EditHandler(w http.ResponseWriter, r *http.Request) {

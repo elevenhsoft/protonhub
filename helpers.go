@@ -158,16 +158,18 @@ func ListRunningGameIds() []string {
 	return locks
 }
 
-func CreateLockfileForProcess(gameId, pid string) {
+func CreateLockfileForProcess(gameId string, pid int) bool {
 	path := GetLockfilePath(gameId)
 
 	file, err := os.Create(path)
 
 	if err != nil {
-		log.Fatal(err)
+		return false
 	}
 
-	file.WriteString(pid)
+	file.WriteString(fmt.Sprintf("%d", pid))
+
+	return err == nil
 }
 
 func RemoveLockfileForProcess(gameId string) bool {
@@ -262,7 +264,7 @@ func initStore() {
 	}
 }
 
-func CmdToResponse(cmd *exec.Cmd, w http.ResponseWriter) {
+func CmdToResponse(gameId string, cmd *exec.Cmd, w http.ResponseWriter) {
 	stdout, err := cmd.StdoutPipe()
 	cmd.Stderr = cmd.Stdout
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
@@ -294,11 +296,16 @@ func CmdToResponse(cmd *exec.Cmd, w http.ResponseWriter) {
 	// Create a scanner which scans stdout in a line-by-line fashion
 	scanner := bufio.NewScanner(stdout)
 
+	go func() {
+		if CreateLockfileForProcess(gameId, pgid) {
+			dataCh <- fmt.Sprintf("[%s] create lockfile for pgid: %d\n", gameId, pgid)
+		}
+	}()
+
 	// Use the scanner to scan the output line by line and log it
 	// It's running in a goroutine so that it doesn't block
 	go func() {
 		// Read line by line and process it
-		dataCh <- fmt.Sprintf("pid: %d", pgid)
 		for scanner.Scan() {
 			line := scanner.Text()
 
@@ -308,7 +315,9 @@ func CmdToResponse(cmd *exec.Cmd, w http.ResponseWriter) {
 				dataCh <- StripANSI(line)
 			}
 		}
-		dataCh <- "0"
+		if RemoveLockfileForProcess(gameId) {
+			dataCh <- fmt.Sprintf("[exit: 0] removing lockfile for pgid: %d", pgid)
+		}
 	}()
 
 	_ = cmd.Wait()

@@ -55,29 +55,11 @@
           );
 
           stopTarget.removeAttribute("disabled");
-
-          await fetch("/create-lock", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ pid: pid, gameid: gameId }),
-          });
         }
 
-        if (event.data != "0") {
-          logger.value += `${event.data}\n`;
-        }
+        logger.value += `${event.data}\n`;
 
-        if (event.data == "0") {
-          await fetch("/remove-lock", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ pid: pid, gameid: gameId }),
-          });
-
+        if (event.data.includes("exit: 0")) {
           ele.textContent = "Launch";
           ele.removeAttribute("disabled");
 
