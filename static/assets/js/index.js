@@ -1,13 +1,7 @@
-let launcherBtn = document.querySelectorAll("#launcher");
-let stopLauncherBtn = document.querySelectorAll(".stopLauncher");
-let launcherLogsClear = document.getElementById("launcherLogsClear");
-let editBtn = document.querySelectorAll("#edit");
-let winetricksBtn = document.getElementById("winetricks");
-let winetricksVerbs = document.getElementById("winetricksVerbs");
-let winetricksLogsClear = document.getElementById("winetricksLogsClear");
-let saveWinetricksVerb = document.getElementById("winetricksVerbsSave");
-
 (async () => {
+  let launcherBtn = document.querySelectorAll("#launcher");
+  let stopLauncherBtn = document.querySelectorAll(".stopLauncher");
+
   await fetch("/running-games")
     .then((response) => {
       return response.json();
@@ -35,6 +29,15 @@ let saveWinetricksVerb = document.getElementById("winetricksVerbsSave");
 })();
 
 (async () => {
+  let launcherBtn = document.querySelectorAll("#launcher");
+  let stopLauncherBtn = document.querySelectorAll(".stopLauncher");
+  let launcherLogsClear = document.getElementById("launcherLogsClear");
+  let editBtn = document.querySelectorAll("#edit");
+  let winetricksBtn = document.getElementById("winetricks");
+  let winetricksVerbs = document.getElementById("winetricksVerbs");
+  let winetricksLogsClear = document.getElementById("winetricksLogsClear");
+  let saveWinetricksVerb = document.getElementById("winetricksVerbsSave");
+
   async function runFetch(gameId, ele) {
     if (gameId) {
       let eventSource = new EventSource(`/run/${gameId}`);
