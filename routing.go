@@ -10,6 +10,7 @@ func Routing(mux *http.ServeMux) {
 	mux.HandleFunc("POST /create-lock", CreateProcessLockHandler)
 	mux.HandleFunc("POST /remove-lock", RemoveProcessLockHandler)
 	mux.HandleFunc("GET /stop/{gameId}", StopProcessHandler)
+	mux.HandleFunc("GET /running-games", RunningGamesHandler)
 	mux.HandleFunc("GET /winetricks/{gameId}/{verbs}", RunWinetricksHandler)
 	mux.HandleFunc("GET /edit/{gameId}", EditHandler)
 	mux.HandleFunc("POST /edit", EditDoneHandler)

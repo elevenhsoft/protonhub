@@ -135,6 +135,24 @@ func StopProcessHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type RunningGamesObject struct {
+	Ids []string `json:"ids"`
+}
+
+func RunningGamesHandler(w http.ResponseWriter, r *http.Request) {
+	ids := ListRunningGameIds()
+
+	obj := RunningGamesObject{Ids: ids}
+	json, err := json.Marshal(obj)
+
+	if err != nil {
+		fmt.Printf("Error: %s", err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(json)
+}
+
 func RunWinetricksHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")

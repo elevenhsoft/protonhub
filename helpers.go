@@ -141,6 +141,23 @@ func GetLockfilePath(gameId string) string {
 	return filepath.Join(phStorePath(), "locks", filename)
 }
 
+func ListRunningGameIds() []string {
+	var locks []string
+	target := filepath.Join(phStorePath(), "locks")
+
+	entries, err := os.ReadDir(target)
+
+	if err != nil {
+		fmt.Printf("Error: %s", err)
+	}
+
+	for _, entry := range entries {
+		locks = append(locks, strings.Split(entry.Name(), ".lock")[0])
+	}
+
+	return locks
+}
+
 func CreateLockfileForProcess(gameId, pid string) {
 	path := GetLockfilePath(gameId)
 

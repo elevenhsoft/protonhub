@@ -6,6 +6,27 @@ let winetricksVerbs = document.getElementById("winetricksVerbs");
 let winetricksLogsClear = document.getElementById("winetricksLogsClear");
 let saveWinetricksVerb = document.getElementById("winetricksVerbsSave");
 
+(async () => {
+  await fetch("/running-games")
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      if (data.ids != null) {
+        for (let i = 0; i < data.ids.length; i++) {
+          let gameId = data.ids[i];
+
+          const targetElement = Array.from(launcherBtn).find(
+            (element) => element.dataset.gameId === gameId,
+          );
+
+          targetElement.textContent = "Process is running...";
+          targetElement.setAttribute("disabled", true);
+        }
+      }
+    });
+})();
+
 async function runFetch(gameId, ele) {
   if (gameId) {
     let eventSource = new EventSource(`/run/${gameId}`);
