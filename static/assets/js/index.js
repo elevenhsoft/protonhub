@@ -34,133 +34,135 @@ let saveWinetricksVerb = document.getElementById("winetricksVerbsSave");
     });
 })();
 
-async function runFetch(gameId, ele) {
-  if (gameId) {
-    let eventSource = new EventSource(`/run/${gameId}`);
-    let pid;
+(async () => {
+  async function runFetch(gameId, ele) {
+    if (gameId) {
+      let eventSource = new EventSource(`/run/${gameId}`);
+      let pid;
 
-    eventSource.onmessage = async (event) => {
-      let logger = document.getElementById("launcherLogging");
-      logger.scrollTop = logger.scrollHeight;
+      eventSource.onmessage = async (event) => {
+        let logger = document.getElementById("launcherLogging");
+        logger.scrollTop = logger.scrollHeight;
 
-      if (event.data.includes("pid:")) {
-        pid = event.data.replace(/^pid: /, "");
+        if (event.data.includes("pid:")) {
+          pid = event.data.replace(/^pid: /, "");
 
-        const stopTarget = Array.from(stopLauncherBtn).find(
-          (element) => element.dataset.gameId === gameId,
-        );
+          const stopTarget = Array.from(stopLauncherBtn).find(
+            (element) => element.dataset.gameId === gameId,
+          );
 
-        stopTarget.removeAttribute("disabled");
+          stopTarget.removeAttribute("disabled");
 
-        await fetch("/create-lock", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ pid: pid, gameid: gameId }),
-        });
-      }
+          await fetch("/create-lock", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ pid: pid, gameid: gameId }),
+          });
+        }
 
-      if (event.data != "0") {
-        logger.value += `${event.data}\n`;
-      }
+        if (event.data != "0") {
+          logger.value += `${event.data}\n`;
+        }
 
-      if (event.data == "0") {
-        await fetch("/remove-lock", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ pid: pid, gameid: gameId }),
-        });
+        if (event.data == "0") {
+          await fetch("/remove-lock", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ pid: pid, gameid: gameId }),
+          });
 
-        ele.textContent = "Launch";
-        ele.removeAttribute("disabled");
+          ele.textContent = "Launch";
+          ele.removeAttribute("disabled");
 
-        eventSource.close();
-      }
-    };
+          eventSource.close();
+        }
+      };
+    }
   }
-}
 
-async function stopFetch(gameId) {
-  if (gameId) {
-    await fetch(`/stop/${gameId}`);
+  async function stopFetch(gameId) {
+    if (gameId) {
+      await fetch(`/stop/${gameId}`);
 
-    const stopTarget = Array.from(stopLauncherBtn).find(
-      (element) => element.dataset.gameId === gameId,
-    );
+      const stopTarget = Array.from(stopLauncherBtn).find(
+        (element) => element.dataset.gameId === gameId,
+      );
 
-    stopTarget.setAttribute("disabled", true);
+      stopTarget.setAttribute("disabled", true);
+    }
   }
-}
 
-async function runWinetricks(gameId, verbs) {
-  if (gameId && verbs) {
-    let eventSource = new EventSource(`/winetricks/${gameId}/${verbs}`);
+  async function runWinetricks(gameId, verbs) {
+    if (gameId && verbs) {
+      let eventSource = new EventSource(`/winetricks/${gameId}/${verbs}`);
 
-    eventSource.onmessage = (event) => {
-      let logger = document.getElementById("commandLogs");
-      logger.scrollTop = logger.scrollHeight;
+      eventSource.onmessage = (event) => {
+        let logger = document.getElementById("commandLogs");
+        logger.scrollTop = logger.scrollHeight;
 
-      if (event.data != "0") {
-        logger.value += `${event.data}\n`;
-      }
+        if (event.data != "0") {
+          logger.value += `${event.data}\n`;
+        }
 
-      if (event.data == "0") {
-        eventSource.close();
-        winetricksBtn.innerText = "Winetricks";
-        saveWinetricksVerb.innerText = "Save";
-        saveWinetricksVerb.removeAttribute("disabled");
-      }
-    };
+        if (event.data == "0") {
+          eventSource.close();
+          winetricksBtn.innerText = "Winetricks";
+          saveWinetricksVerb.innerText = "Save";
+          saveWinetricksVerb.removeAttribute("disabled");
+        }
+      };
+    }
   }
-}
 
-launcherBtn.forEach((ele, _) => {
-  ele.addEventListener("click", async () => {
-    ele.textContent = "Process is running...";
-    ele.setAttribute("disabled", true);
+  launcherBtn.forEach((ele, _) => {
+    ele.addEventListener("click", async () => {
+      ele.textContent = "Process is running...";
+      ele.setAttribute("disabled", true);
 
-    let gameId = ele.dataset.gameId;
+      let gameId = ele.dataset.gameId;
 
-    await runFetch(gameId, ele);
+      await runFetch(gameId, ele);
+    });
   });
-});
 
-stopLauncherBtn.forEach((ele, _) => {
-  ele.addEventListener("click", async () => {
-    let gameId = ele.dataset.gameId;
+  stopLauncherBtn.forEach((ele, _) => {
+    ele.addEventListener("click", async () => {
+      let gameId = ele.dataset.gameId;
 
-    await stopFetch(gameId);
+      await stopFetch(gameId);
+    });
   });
-});
 
-launcherLogsClear.addEventListener("click", () => {
-  document.getElementById("launcherLogging").value = "";
-});
-
-editBtn.forEach((ele, _) => {
-  ele.addEventListener("click", () => {
-    gameId = ele.dataset.gameId;
-
-    window.location.href = `/edit/${gameId}`;
+  launcherLogsClear.addEventListener("click", () => {
+    document.getElementById("launcherLogging").value = "";
   });
-});
 
-saveWinetricksVerb.addEventListener("click", async () => {
-  let gameId = winetricksBtn.dataset.gameId;
-  let verbs = winetricksVerbs.value;
+  editBtn.forEach((ele, _) => {
+    ele.addEventListener("click", () => {
+      gameId = ele.dataset.gameId;
 
-  if (gameId && verbs) {
-    winetricksBtn.innerText = "Process is running...";
-    saveWinetricksVerb.innerText = "Process is running...";
-    saveWinetricksVerb.setAttribute("disabled", true);
-  }
+      window.location.href = `/edit/${gameId}`;
+    });
+  });
 
-  await runWinetricks(gameId, verbs);
-});
+  saveWinetricksVerb.addEventListener("click", async () => {
+    let gameId = winetricksBtn.dataset.gameId;
+    let verbs = winetricksVerbs.value;
 
-winetricksLogsClear.addEventListener("click", () => {
-  document.getElementById("commandLogs").value = "";
-});
+    if (gameId && verbs) {
+      winetricksBtn.innerText = "Process is running...";
+      saveWinetricksVerb.innerText = "Process is running...";
+      saveWinetricksVerb.setAttribute("disabled", true);
+    }
+
+    await runWinetricks(gameId, verbs);
+  });
+
+  winetricksLogsClear.addEventListener("click", () => {
+    document.getElementById("commandLogs").value = "";
+  });
+})();
