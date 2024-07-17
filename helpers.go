@@ -330,12 +330,10 @@ func CmdToResponse(gameId string, cmd *exec.Cmd, w http.ResponseWriter) {
 		}
 	}()
 
-	err = cmd.Wait()
+	_ = cmd.Wait()
 
-	if err == nil {
-		if RemoveLockfileForProcess(gameId) {
-			fmt.Fprintf(w, "data: [exit: 0] removing lockfile for pgid: %d\n\n", pgid)
-			w.(http.Flusher).Flush()
-		}
+	if RemoveLockfileForProcess(gameId) {
+		fmt.Fprintf(w, "data: [exit: 0] removing lockfile for pgid: %d\n\n", pgid)
+		w.(http.Flusher).Flush()
 	}
 }

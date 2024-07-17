@@ -89,11 +89,9 @@
         let logger = document.getElementById("commandLogs");
         logger.scrollTop = logger.scrollHeight;
 
-        if (event.data != "0") {
-          logger.value += `${event.data}\n`;
-        }
+        logger.value += `${event.data}\n`;
 
-        if (event.data == "0") {
+        if (event.data.includes("exit: 0")) {
           eventSource.close();
           winetricksBtn.innerText = "Winetricks";
           saveWinetricksVerb.innerText = "Save";
