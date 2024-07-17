@@ -1,4 +1,5 @@
 let launcherBtn = document.querySelectorAll("#launcher");
+let stopLauncherBtn = document.querySelectorAll(".stopLauncher");
 let launcherLogsClear = document.getElementById("launcherLogsClear");
 let editBtn = document.querySelectorAll("#edit");
 let winetricksBtn = document.getElementById("winetricks");
@@ -22,6 +23,12 @@ let saveWinetricksVerb = document.getElementById("winetricksVerbsSave");
 
           targetElement.textContent = "Process is running...";
           targetElement.setAttribute("disabled", true);
+
+          const stopTarget = Array.from(stopLauncherBtn).find(
+            (element) => element.dataset.gameId === gameId,
+          );
+
+          stopTarget.removeAttribute("disabled");
         }
       }
     });
@@ -38,6 +45,12 @@ async function runFetch(gameId, ele) {
 
       if (event.data.includes("pid:")) {
         pid = event.data.replace(/^pid: /, "");
+
+        const stopTarget = Array.from(stopLauncherBtn).find(
+          (element) => element.dataset.gameId === gameId,
+        );
+
+        stopTarget.removeAttribute("disabled");
 
         await fetch("/create-lock", {
           method: "POST",
@@ -67,6 +80,18 @@ async function runFetch(gameId, ele) {
         eventSource.close();
       }
     };
+  }
+}
+
+async function stopFetch(gameId) {
+  if (gameId) {
+    await fetch(`/stop/${gameId}`);
+
+    const stopTarget = Array.from(stopLauncherBtn).find(
+      (element) => element.dataset.gameId === gameId,
+    );
+
+    stopTarget.setAttribute("disabled", true);
   }
 }
 
@@ -100,6 +125,14 @@ launcherBtn.forEach((ele, _) => {
     let gameId = ele.dataset.gameId;
 
     await runFetch(gameId, ele);
+  });
+});
+
+stopLauncherBtn.forEach((ele, _) => {
+  ele.addEventListener("click", async () => {
+    let gameId = ele.dataset.gameId;
+
+    await stopFetch(gameId);
   });
 });
 

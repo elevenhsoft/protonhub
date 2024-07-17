@@ -38,20 +38,18 @@
             </button>
             <ul class="dropdown-menu">
               <li>
-                <a
-                  href="/stop/{{ .GameID }}"
+                <button
                   class="dropdown-item stopLauncher"
                   data-game-id="{{ .GameID }}"
-                  >Stop</a
-                >
+                  disabled
+                >Stop</button>
               </li>
               <li>
-                <a
+                <button
                   class="dropdown-item"
-                  href="#"
                   data-bs-toggle="modal"
                   data-bs-target="#launcherLogs"
-                  >Logs</a
+                  >Logs</button
                 >
               </li>
             </ul>
@@ -114,7 +112,7 @@
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="winetricksModalTitle">
+        <h1 class="modal-title fs-5" id="launcherModalTitle">
          Launcher Logging 
         </h1>
         <button
