@@ -1,11 +1,9 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -78,58 +76,12 @@ func RunHandler(w http.ResponseWriter, r *http.Request) {
 	config := GetConfigPath(launcher)
 
 	cmd := exec.Command("umu-run", "--config", config)
-	stdout, err := cmd.StdoutPipe()
-	cmd.Stderr = cmd.Stdout
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	dataCh := make(chan string)
 
 	// Create a context for handling client disconnection
 	_, cancel := context.WithCancel(r.Context())
 	defer cancel()
 
-	go func() {
-		for data := range dataCh {
-			fmt.Fprintf(w, "data: %s\n\n", data)
-			w.(http.Flusher).Flush()
-		}
-	}()
-
-	// Create a scanner which scans r in a line-by-line fashion
-	scanner := bufio.NewScanner(stdout)
-
-	// Use the scanner to scan the output line by line and log it
-
-	// It's running in a goroutine so that it doesn't block
-
-	go func() {
-
-		// Read line by line and process it
-		for scanner.Scan() {
-			line := scanner.Text()
-
-			fmt.Println(line)
-
-			if line != "" {
-				dataCh <- Strip(line)
-			}
-		}
-
-		dataCh <- "0"
-
-	}()
-
-	// Start the command and check for errors
-	err = cmd.Start()
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	_ = cmd.Wait()
+	CmdToResponse(cmd, w)
 }
 
 func RunWinetricksHandler(w http.ResponseWriter, r *http.Request) {
@@ -156,60 +108,11 @@ func RunWinetricksHandler(w http.ResponseWriter, r *http.Request) {
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, gameidEnv, protonpathEnv)
 
-	stdout, err := cmd.StdoutPipe()
-	cmd.Stderr = cmd.Stdout
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	dataCh := make(chan string)
-
 	// Create a context for handling client disconnection
 	_, cancel := context.WithCancel(r.Context())
 	defer cancel()
 
-	go func() {
-		for data := range dataCh {
-			fmt.Fprintf(w, "data: %s\n\n", data)
-			w.(http.Flusher).Flush()
-		}
-	}()
-
-	// Create a scanner which scans r in a line-by-line fashion
-	scanner := bufio.NewScanner(stdout)
-
-	// Use the scanner to scan the output line by line and log it
-
-	// It's running in a goroutine so that it doesn't block
-
-	go func() {
-
-		// Read line by line and process it
-		for scanner.Scan() {
-			line := scanner.Text()
-
-			fmt.Println(line)
-
-			if line != "" {
-				dataCh <- Strip(line)
-			}
-		}
-
-		dataCh <- "0"
-
-	}()
-
-	// Start the command and check for errors
-
-	err = cmd.Start()
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	_ = cmd.Wait()
-
+	CmdToResponse(cmd, w)
 }
 
 func EditHandler(w http.ResponseWriter, r *http.Request) {
