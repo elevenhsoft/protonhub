@@ -9,19 +9,41 @@ let saveWinetricksVerb = document.getElementById("winetricksVerbsSave");
 async function runFetch(gameId, ele) {
   if (gameId) {
     let eventSource = new EventSource(`/run/${gameId}`);
+    let pid;
 
-    eventSource.onmessage = (event) => {
+    eventSource.onmessage = async (event) => {
       let logger = document.getElementById("launcherLogging");
       logger.scrollTop = logger.scrollHeight;
+
+      if (event.data.includes("pid:")) {
+        pid = event.data.replace(/^pid: /, "");
+
+        await fetch("/create-lock", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ pid: pid, gameid: gameId }),
+        });
+      }
 
       if (event.data != "0") {
         logger.value += `${event.data}\n`;
       }
 
       if (event.data == "0") {
-        eventSource.close();
+        await fetch("/remove-lock", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ pid: pid, gameid: gameId }),
+        });
+
         ele.textContent = "Launch";
         ele.removeAttribute("disabled");
+
+        eventSource.close();
       }
     };
   }

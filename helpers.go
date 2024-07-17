@@ -133,6 +133,36 @@ func GetConfigPath(cfg string) string {
 	return filepath.Join(phStorePath(), "configs", cfg)
 }
 
+func GetLockfilePath(gameId string) string {
+	filename := fmt.Sprintf("%s.lock", gameId)
+	return filepath.Join(phStorePath(), "locks", filename)
+}
+
+func CreateLockfileForProcess(gameId, pid string) {
+	path := GetLockfilePath(gameId)
+
+	file, err := os.Create(path)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	file.WriteString(pid)
+}
+
+func RemoveLockfileForProcess(gameId string) bool {
+	path := GetLockfilePath(gameId)
+
+	_, err := os.Stat(path)
+
+	if os.IsNotExist(err) {
+		return false
+	}
+
+	os.Remove(path)
+	return err == nil
+}
+
 func homePath() string {
 	return os.Getenv("HOME")
 }
@@ -149,11 +179,24 @@ func initStore() {
 		os.MkdirAll(path, 0755)
 	}
 
+	path = filepath.Join(phStorePath(), "locks")
+	_, err = os.Stat(path)
+
+	if os.IsNotExist(err) {
+		os.MkdirAll(path, 0755)
+	}
 }
 
 func CmdToResponse(cmd *exec.Cmd, w http.ResponseWriter) {
 	stdout, err := cmd.StdoutPipe()
 	cmd.Stderr = cmd.Stdout
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Start the command and check for errors
+	err = cmd.Start()
 
 	if err != nil {
 		log.Fatal(err)
@@ -174,6 +217,7 @@ func CmdToResponse(cmd *exec.Cmd, w http.ResponseWriter) {
 	// It's running in a goroutine so that it doesn't block
 	go func() {
 		// Read line by line and process it
+		dataCh <- fmt.Sprintf("pid: %d", cmd.Process.Pid)
 		for scanner.Scan() {
 			line := scanner.Text()
 
@@ -185,12 +229,6 @@ func CmdToResponse(cmd *exec.Cmd, w http.ResponseWriter) {
 		}
 		dataCh <- "0"
 	}()
-	// Start the command and check for errors
-	err = cmd.Start()
-
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	_ = cmd.Wait()
 }
