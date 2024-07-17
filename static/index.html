@@ -42,15 +42,18 @@
                   class="dropdown-item stopLauncher"
                   data-game-id="{{ .GameID }}"
                   disabled
-                >Stop</button>
+                >
+                  Stop
+                </button>
               </li>
               <li>
                 <button
                   class="dropdown-item"
                   data-bs-toggle="modal"
                   data-bs-target="#launcherLogs"
-                  >Logs</button
                 >
+                  Logs
+                </button>
               </li>
             </ul>
           </div>
@@ -65,27 +68,27 @@
             </button>
             <ul class="dropdown-menu">
               <li>
-                <a
+                <button
                   class="dropdown-item"
-                  href="#"
                   id="edit"
                   data-game-id="{{ .GameID }}"
-                  >Edit</a
                 >
+                  Edit
+                </button>
               </li>
               <li>
-                <a
+                <button
                   id="winetricks"
                   class="dropdown-item"
-                  href="#"
                   data-game-id="{{ .GameID }}"
                   data-bs-toggle="modal"
                   data-bs-target="#winetricksModal"
-                  >Winetricks</a
                 >
+                  Winetricks
+                </button>
               </li>
               <li><hr class="dropdown-divider" /></li>
-              <li><a class="dropdown-item" href="#">Delete</a></li>
+              <li><button class="dropdown-item">Delete</button></li>
             </ul>
           </div>
         </td>
@@ -113,7 +116,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="launcherModalTitle">
-         Launcher Logging 
+          Launcher Logging
         </h1>
         <button
           type="button"
@@ -124,13 +127,12 @@
       </div>
       <div class="modal-body">
         <div class="row">
-            <textarea
-              class="form-control"
-              id="launcherLogging"
-              rows="26"
-              disabled
-            ></textarea>
-          </div>
+          <textarea
+            class="form-control"
+            id="launcherLogging"
+            rows="26"
+            disabled
+          ></textarea>
         </div>
       </div>
       <div class="modal-footer">
