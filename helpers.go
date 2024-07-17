@@ -16,11 +16,10 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-const ansi = "[\u001B\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntqry=><~]))"
+func StripANSI(str string) string {
+	const ansi = "[\u001B\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntqry=><~]))"
+	var re = regexp.MustCompile(ansi)
 
-var re = regexp.MustCompile(ansi)
-
-func Strip(str string) string {
 	return re.ReplaceAllString(str, "")
 }
 
@@ -181,7 +180,7 @@ func CmdToResponse(cmd *exec.Cmd, w http.ResponseWriter) {
 			fmt.Println(line)
 
 			if line != "" {
-				dataCh <- Strip(line)
+				dataCh <- StripANSI(line)
 			}
 		}
 		dataCh <- "0"
