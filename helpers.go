@@ -183,7 +183,7 @@ func RemoveLockfileForProcess(gameId string) bool {
 	return err == nil
 }
 
-func KillProcessForGameId(gameId string) bool {
+func KillProcessByGameId(gameId string) bool {
 	var pid_folder []int
 	pids, err := getNewPids()
 

@@ -130,7 +130,7 @@ func RemoveProcessLockHandler(w http.ResponseWriter, r *http.Request) {
 func StopProcessHandler(w http.ResponseWriter, r *http.Request) {
 	gameId := r.PathValue("gameId")
 
-	KillProcessForGameId(gameId)
+	KillProcessByGameId(gameId)
 }
 
 type RunningGamesObject struct {
