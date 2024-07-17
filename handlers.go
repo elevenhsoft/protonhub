@@ -127,6 +127,14 @@ func RemoveProcessLockHandler(w http.ResponseWriter, r *http.Request) {
 	RemoveLockfileForProcess(obj.GameID)
 }
 
+func StopProcessHandler(w http.ResponseWriter, r *http.Request) {
+	gameId := r.PathValue("gameId")
+
+	if KillProcessForGameId(gameId) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}
+}
+
 func RunWinetricksHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")

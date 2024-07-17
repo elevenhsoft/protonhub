@@ -11,9 +11,12 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
+	"syscall"
 
 	"github.com/BurntSushi/toml"
+	"github.com/mitchellh/go-ps"
 )
 
 func StripANSI(str string) string {
@@ -163,6 +166,61 @@ func RemoveLockfileForProcess(gameId string) bool {
 	return err == nil
 }
 
+func KillProcessForGameId(gameId string) bool {
+	var pid_folder []int
+	pids, err := getNewPids()
+
+	if err != nil {
+		fmt.Printf("Error: %s", err)
+	}
+
+	path := GetLockfilePath(gameId)
+	_, err = os.Stat(path)
+
+	if os.IsNotExist(err) {
+		return false
+	}
+
+	content, err := os.ReadFile(path)
+
+	if err != nil {
+		fmt.Printf("Error: %s", err)
+	}
+
+	pid, err := strconv.Atoi(string(content))
+	pid_folder = append(pid_folder, pid)
+
+	conn := DbConnection()
+	launcher := GetLauncherByIdFromDb(conn, gameId)
+
+	target_exe := strings.Split(launcher.Exe, "/")
+
+	for _, exe := range pids {
+		if exe.Executable() == target_exe[len(target_exe)-1] {
+			pid_folder = append(pid_folder, exe.Pid())
+		}
+	}
+
+	for _, pid := range pid_folder {
+		syscall.Kill(-pid, 15)
+	}
+
+	RemoveLockfileForProcess(gameId)
+
+	return err == nil
+}
+
+func getNewPids() ([]ps.Process, error) {
+	pids, err := ps.Processes()
+
+	if err != nil {
+		fmt.Printf("cannot get list of currently running processes")
+		return nil, err
+	}
+
+	return pids, nil
+}
+
 func homePath() string {
 	return os.Getenv("HOME")
 }
@@ -190,6 +248,7 @@ func initStore() {
 func CmdToResponse(cmd *exec.Cmd, w http.ResponseWriter) {
 	stdout, err := cmd.StdoutPipe()
 	cmd.Stderr = cmd.Stdout
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
 	if err != nil {
 		log.Fatal(err)
@@ -198,6 +257,11 @@ func CmdToResponse(cmd *exec.Cmd, w http.ResponseWriter) {
 	// Start the command and check for errors
 	err = cmd.Start()
 
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	pgid, err := syscall.Getpgid(cmd.Process.Pid)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -217,7 +281,7 @@ func CmdToResponse(cmd *exec.Cmd, w http.ResponseWriter) {
 	// It's running in a goroutine so that it doesn't block
 	go func() {
 		// Read line by line and process it
-		dataCh <- fmt.Sprintf("pid: %d", cmd.Process.Pid)
+		dataCh <- fmt.Sprintf("pid: %d", pgid)
 		for scanner.Scan() {
 			line := scanner.Text()
 
