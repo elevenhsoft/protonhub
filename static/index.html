@@ -1,216 +1,230 @@
 {{define "head"}}
 <title>ProtonHub :: Index</title>
 {{end}} {{define "body"}}
-<h1>Launchers</h1>
-<div class="row m-3">
-  <table class="table table-striped-columns">
-    <thead>
-      <tr>
-        <th scope="col">#</th>
-        <th scope="col">Name</th>
-        <th scope="col">Prefix</th>
-        <th scope="col">Proton</th>
-        <th scope="col">Exe</th>
-        <th scope="col">Arguments</th>
-        <th scope="col">Store</th>
-        <th scope="col">Game ID</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{ range .}}
-      <tr>
-        <td scope="row">
-          <div class="btn-group">
-            <button
-              id="launcher"
-              class="btn btn-success"
-              data-game-id="{{ .GameID }}"
-            >
-              Launch
-            </button>
-            <button
-              type="button"
-              class="btn btn-success dropdown-toggle dropdown-toggle-split"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              <span class="visually-hidden">Toggle Dropdown</span>
-            </button>
-            <ul class="dropdown-menu">
-              <li>
-                <button
-                  class="dropdown-item stopLauncher"
-                  data-game-id="{{ .GameID }}"
-                  disabled
-                >
-                  Stop
-                </button>
-              </li>
-              <li>
-                <button
-                  class="dropdown-item"
-                  data-bs-toggle="modal"
-                  data-bs-target="#launcherLogs"
-                >
-                  Logs
-                </button>
-              </li>
-            </ul>
-          </div>
-          <div class="btn-group">
-            <button
-              type="button"
-              class="btn btn-primary dropdown-toggle"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              Manage
-            </button>
-            <ul class="dropdown-menu">
-              <li>
-                <button
-                  class="dropdown-item"
-                  id="edit"
-                  data-game-id="{{ .GameID }}"
-                >
-                  Edit
-                </button>
-              </li>
-              <li>
-                <button
-                  id="winetricks"
-                  class="dropdown-item"
-                  data-game-id="{{ .GameID }}"
-                  data-bs-toggle="modal"
-                  data-bs-target="#winetricksModal"
-                >
-                  Winetricks
-                </button>
-              </li>
-              <li><hr class="dropdown-divider" /></li>
-              <li><button class="dropdown-item">Delete</button></li>
-            </ul>
-          </div>
-        </td>
-        <td>{{ .Name }}</td>
-        <td>{{ .Prefix }}</td>
-        <td>{{ .Proton }}</td>
-        <td>{{ .Exe }}</td>
-        <td>{{ .LaunchArgs }}</td>
-        <td>{{ .Store }}</td>
-        <td>{{ .GameID }}</td>
-      </tr>
-      {{end}}
-    </tbody>
-  </table>
-</div>
-
-<div
-  class="modal fade"
-  id="launcherLogs"
-  tabindex="-1"
-  aria-labelledby="launcherLogs"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="launcherModalTitle">
-          Launcher Logging
-        </h1>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-          <textarea
-            class="form-control"
-            id="launcherLogging"
-            rows="26"
-            disabled
-          ></textarea>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Close
-        </button>
-        <button type="button" class="btn btn-danger" id="launcherLogsClear">
-          Clear
-        </button>
-      </div>
-    </div>
+<div class="container-fluid">
+  <h1>Launchers</h1>
+  <div class="row m-3">
+    <table class="table table-striped-columns">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Name</th>
+          <th scope="col">Prefix</th>
+          <th scope="col">Proton</th>
+          <th scope="col">Exe</th>
+          <th scope="col">Arguments</th>
+          <th scope="col">Store</th>
+          <th scope="col">Game ID</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ range .}}
+        <tr>
+          <td scope="row">
+            <div class="btn-group">
+              <button
+                id="launcher"
+                class="btn btn-success"
+                data-game-id="{{ .GameID }}"
+              >
+                Launch
+              </button>
+              <button
+                type="button"
+                class="btn btn-success dropdown-toggle dropdown-toggle-split"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <span class="visually-hidden">Toggle Dropdown</span>
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <button
+                    class="dropdown-item stopLauncher"
+                    data-game-id="{{ .GameID }}"
+                    disabled
+                  >
+                    Stop
+                  </button>
+                </li>
+                <li>
+                  <button
+                    class="dropdown-item"
+                    data-bs-toggle="modal"
+                    data-bs-target="#launcherLogs"
+                  >
+                    Logs
+                  </button>
+                </li>
+              </ul>
+            </div>
+            <div class="btn-group">
+              <button
+                type="button"
+                class="btn btn-primary dropdown-toggle"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Manage
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <button
+                    class="dropdown-item"
+                    id="edit"
+                    data-game-id="{{ .GameID }}"
+                  >
+                    Edit
+                  </button>
+                </li>
+                <li>
+                  <button
+                    id="winetricks"
+                    class="dropdown-item"
+                    data-game-id="{{ .GameID }}"
+                    data-bs-toggle="modal"
+                    data-bs-target="#winetricksModal"
+                  >
+                    Winetricks
+                  </button>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li><button class="dropdown-item">Delete</button></li>
+              </ul>
+            </div>
+          </td>
+          <td>{{ .Name }}</td>
+          <td>{{ .Prefix }}</td>
+          <td>{{ .Proton }}</td>
+          <td>{{ .Exe }}</td>
+          <td>{{ .LaunchArgs }}</td>
+          <td>{{ .Store }}</td>
+          <td>{{ .GameID }}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
   </div>
-</div>
 
-<div
-  class="modal fade"
-  id="winetricksModal"
-  tabindex="-1"
-  aria-labelledby="winetricksModal"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="winetricksModalTitle">
-          Winetricks verbs prompt
-        </h1>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-          <p>
-            Put your winetricks verbs below. Separate each verb with space. List
-            of allowed verbs here:
-            <a
-              href="https://github.com/Open-Wine-Components/umu-launcher/blob/main/tests/testdata/winetricks_verbs.txt"
-              >winetricks_verbs.txt</a
-            >
-          </p>
+  <div
+    class="modal fade"
+    id="launcherLogs"
+    tabindex="-1"
+    aria-labelledby="launcherLogs"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="launcherModalTitle">
+            Launcher Logging
+          </h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
         </div>
-        <div class="row">
-          <div class="input-group mb-3">
-            <span class="input-group-text">winetricks</span>
-            <input
-              type="text"
-              class="form-control"
-              id="winetricksVerbs"
-              placeholder="dotnet40 dotnet48 vcrun2019"
-            />
-          </div>
-        </div>
-        <div class="row">
-          <div class="mb-3">
-            <label for="commandLogs" class="form-label">Command logs</label>
+        <div class="modal-body">
+          <div class="row">
             <textarea
               class="form-control"
-              id="commandLogs"
-              rows="22"
+              id="launcherLogging"
+              rows="26"
               disabled
             ></textarea>
           </div>
         </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+          <button type="button" class="btn btn-danger" id="launcherLogsClear">
+            Clear
+          </button>
+        </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Close
-        </button>
-        <button type="button" class="btn btn-danger" id="winetricksLogsClear">
-          Clear
-        </button>
-        <button type="button" class="btn btn-primary" id="winetricksVerbsSave">
-          Save
-        </button>
+    </div>
+  </div>
+
+  <div
+    class="modal fade"
+    id="winetricksModal"
+    tabindex="-1"
+    aria-labelledby="winetricksModal"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="winetricksModalTitle">
+            Winetricks verbs prompt
+          </h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <p>
+              Put your winetricks verbs below. Separate each verb with space.
+              List of allowed verbs here:
+              <a
+                href="https://github.com/Open-Wine-Components/umu-launcher/blob/main/tests/testdata/winetricks_verbs.txt"
+                >winetricks_verbs.txt</a
+              >
+            </p>
+          </div>
+          <div class="row">
+            <div class="input-group mb-3">
+              <span class="input-group-text">winetricks</span>
+              <input
+                type="text"
+                class="form-control"
+                id="winetricksVerbs"
+                placeholder="dotnet40 dotnet48 vcrun2019"
+              />
+            </div>
+          </div>
+          <div class="row">
+            <div class="mb-3">
+              <label for="commandLogs" class="form-label">Command logs</label>
+              <textarea
+                class="form-control"
+                id="commandLogs"
+                rows="22"
+                disabled
+              ></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Close
+          </button>
+          <button type="button" class="btn btn-danger" id="winetricksLogsClear">
+            Clear
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="winetricksVerbsSave"
+          >
+            Save
+          </button>
+        </div>
       </div>
     </div>
   </div>
