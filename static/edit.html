@@ -8,72 +8,32 @@
     <form action="/edit" method="POST">
       <div class="mb-3">
         <label for="launcherName" class="form-label">Launcher name</label>
-        <input
-          type="text"
-          class="form-control"
-          name="launcherName"
-          value="{{ .Name }}"
-        />
+        <input type="text" class="form-control" name="launcherName" value="{{ .Name }}" />
       </div>
       <div class="mb-3">
         <label for="protonPath" class="form-label">Proton Path</label>
-        <input
-          type="text"
-          class="form-control"
-          name="protonPath"
-          placeholder="~/GE-Proton30"
-          value="{{ .Proton }}"
-        />
+        <input type="text" class="form-control" name="protonPath" placeholder="~/GE-Proton30" value="{{ .Proton }}" />
       </div>
       <div class="mb-3">
         <label for="prefixPath" class="form-label">Prefix Path</label>
-        <input
-          type="text"
-          class="form-control"
-          name="prefixPath"
-          placeholder="~/.wine"
-          value="{{ .Prefix }}"
-        />
+        <input type="text" class="form-control" name="prefixPath" placeholder="~/.wine" value="{{ .Prefix }}" />
       </div>
       <div class="mb-3">
         <label for="launcherPathExe" class="form-label">Run this file</label>
-        <input
-          type="text"
-          class="form-control"
-          name="launcherPathExe"
-          placeholder="~/foo.exe"
-          value="{{ .Exe }}"
-        />
+        <input type="text" class="form-control" name="launcherPathExe" placeholder="~/foo.exe" value="{{ .Exe }}" />
       </div>
       <div class="mb-3">
-        <label for="launcherExeArgs" class="form-label"
-          >Run with this arguments</label
-        >
-        <input
-          type="text"
-          class="form-control"
-          name="launcherExeArgs"
-          placeholder="-opengl, -SkipBuildPatchPrereq"
-          value="{{ unparseArgs .LaunchArgs }}"
-        />
+        <label for="launcherExeArgs" class="form-label">Run with this arguments</label>
+        <input type="text" class="form-control" name="launcherExeArgs" placeholder="-opengl, -SkipBuildPatchPrereq"
+          value="{{ .LaunchArgs }}" />
       </div>
       <div class="mb-3">
         <label for="launcherGameId" class="form-label">Game ID</label>
-        <input
-          type="text"
-          class="form-control"
-          name="launcherGameId"
-          placeholder="umu-271590"
-          value="{{ .GameID }}"
-        />
+        <input type="text" class="form-control" name="launcherGameId" placeholder="umu-271590" value="{{ .GameID }}" />
       </div>
       <div class="mb-3">
         <label for="launcherGameStore" class="form-label">Game store</label>
-        <select
-          class="form-select"
-          name="launcherGameStore"
-          aria-label="game-store"
-        >
+        <select class="form-select" name="launcherGameStore" aria-label="game-store">
           <option selected>{{ .Store }}</option>
           <option value="egs">Epic Game Store</option>
           <option value="gog">GOG Games</option>

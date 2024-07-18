@@ -1,10 +1,13 @@
 package main
 
-import "net/http"
+import (
+	"io/fs"
+	"log"
+	"net/http"
+)
 
 func Routing(mux *http.ServeMux) {
 	mux.HandleFunc("GET /", RootHandler)
-	mux.HandleFunc("GET /create", CreateHandler)
 	mux.HandleFunc("POST /create", CreateDoneHandler)
 	mux.HandleFunc("POST /delete", DeleteHandler)
 	mux.HandleFunc("GET /run/{gameId}", RunHandler)
@@ -14,5 +17,11 @@ func Routing(mux *http.ServeMux) {
 	mux.HandleFunc("GET /edit/{gameId}", EditHandler)
 	mux.HandleFunc("POST /edit", EditDoneHandler)
 
-	mux.Handle("GET /assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("./static/assets/"))))
+	assetsRoot, err := fs.Sub(files, "static/assets")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	mux.Handle("GET /assets/", http.StripPrefix("/assets/", http.FileServerFS(assetsRoot)))
 }

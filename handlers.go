@@ -6,37 +6,44 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"io/fs"
 	"net/http"
 	"os"
 	"os/exec"
 	"strings"
 )
 
-var tmpl = make(map[string]*template.Template)
+var templates map[string]*template.Template
 
-func tmplCache() map[string]*template.Template {
-	editFunc := template.FuncMap{
-		"unparseArgs": UnParseLauncherArgs,
+func LoadTemplates() error {
+	if templates == nil {
+		templates = make(map[string]*template.Template)
+	}
+	tmplFiles, err := fs.ReadDir(files, "static")
+	if err != nil {
+		return err
 	}
 
-	editTpl, editErr := template.New("./static/edit.html").Funcs(editFunc).ParseFiles("./static/edit.html", "./static/base.html")
+	for _, tmpl := range tmplFiles {
+		if tmpl.IsDir() {
+			continue
+		}
 
-	tmpl["index"] = template.Must(template.ParseFiles("./static/index.html", "./static/base.html"))
-	tmpl["edit"] = template.Must(editTpl, editErr)
-	tmpl["create"] = template.Must(template.ParseFiles("./static/create.html", "./static/base.html"))
+		pt, err := template.ParseFS(files, "static/"+tmpl.Name(), "static/*.html")
+		if err != nil {
+			return err
+		}
 
-	return tmpl
+		templates[tmpl.Name()] = pt
+	}
+	return nil
 }
 
 func RootHandler(w http.ResponseWriter, r *http.Request) {
 	conn := DbConnection()
 	launchers := GetLaunchersFromDb(conn)
 
-	tmplCache()["index"].ExecuteTemplate(w, "base", launchers)
-}
-
-func CreateHandler(w http.ResponseWriter, r *http.Request) {
-	tmplCache()["create"].ExecuteTemplate(w, "base", nil)
+	templates["index.html"].ExecuteTemplate(w, "base", launchers)
 }
 
 func CreateDoneHandler(w http.ResponseWriter, r *http.Request) {
@@ -163,7 +170,7 @@ func EditHandler(w http.ResponseWriter, r *http.Request) {
 	conn := DbConnection()
 	launcher := GetLauncherByIdFromDb(conn, gameId)
 
-	tmplCache()["edit"].ExecuteTemplate(w, "base", launcher)
+	templates["edit.html"].ExecuteTemplate(w, "base", launcher)
 }
 
 func EditDoneHandler(w http.ResponseWriter, r *http.Request) {
