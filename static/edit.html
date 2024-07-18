@@ -5,22 +5,37 @@
   <h1>Edit - {{ .Name }}</h1>
 
   <div class="row m-3">
-    <form action="/edit" method="POST">
+    <form action="/edit" method="POST" class="needs-validation" novalidate>
       <div class="mb-3">
         <label for="launcherName" class="form-label">Launcher name</label>
-        <input type="text" class="form-control" name="launcherName" value="{{ .Name }}" />
+        <input type="text" class="form-control" name="launcherName" value="{{ .Name }}" required />
+        <div class="invalid-feedback">
+          Please set valid Launcher Name
+        </div>
       </div>
       <div class="mb-3">
         <label for="protonPath" class="form-label">Proton Path</label>
-        <input type="text" class="form-control" name="protonPath" placeholder="~/GE-Proton30" value="{{ .Proton }}" />
+        <input type="text" class="form-control" name="protonPath" placeholder="~/GE-Proton30" value="{{ .Proton }}"
+          required />
+        <div class="invalid-feedback">
+          Please set valid Proton Path
+        </div>
       </div>
       <div class="mb-3">
         <label for="prefixPath" class="form-label">Prefix Path</label>
-        <input type="text" class="form-control" name="prefixPath" placeholder="~/.wine" value="{{ .Prefix }}" />
+        <input type="text" class="form-control" name="prefixPath" placeholder="~/.wine" value="{{ .Prefix }}"
+          required />
+        <div class="invalid-feedback">
+          Please set valid Wine Prefix Path
+        </div>
       </div>
       <div class="mb-3">
         <label for="launcherPathExe" class="form-label">Run this file</label>
-        <input type="text" class="form-control" name="launcherPathExe" placeholder="~/foo.exe" value="{{ .Exe }}" />
+        <input type="text" class="form-control" name="launcherPathExe" placeholder="~/foo.exe" value="{{ .Exe }}"
+          required />
+        <div class="invalid-feedback">
+          Please set valid Executable Path
+        </div>
       </div>
       <div class="mb-3">
         <label for="launcherExeArgs" class="form-label">Run with this arguments</label>
@@ -29,7 +44,11 @@
       </div>
       <div class="mb-3">
         <label for="launcherGameId" class="form-label">Game ID</label>
-        <input type="text" class="form-control" name="launcherGameId" placeholder="umu-271590" value="{{ .GameID }}" />
+        <input type="text" class="form-control" name="launcherGameId" placeholder="umu-271590" value="{{ .GameID }}"
+          required />
+        <div class="invalid-feedback">
+          Please set valid your Game ID
+        </div>
       </div>
       <div class="mb-3">
         <label for="launcherGameStore" class="form-label">Game store</label>
@@ -48,4 +67,6 @@
     </form>
   </div>
 </div>
+
+<script type="text/javascript" src="/assets/js/edit.js"></script>
 {{end}}

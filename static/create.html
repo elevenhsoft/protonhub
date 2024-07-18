@@ -4,22 +4,34 @@
 <div class="container">
   <h1>Create new launcher</h1>
   <div class="row m-3">
-    <form action="/create" method="POST">
+    <form action="/create" method="POST" class="needs-validation" novalidate>
       <div class="mb-3">
         <label for="launcherName" class="form-label">Launcher name</label>
-        <input type="text" class="form-control" name="launcherName" />
+        <input type="text" class="form-control" name="launcherName" required />
+        <div class="invalid-feedback">
+          Please set valid Launcher Name
+        </div>
       </div>
       <div class="mb-3">
         <label for="protonPath" class="form-label">Proton Path</label>
-        <input type="text" class="form-control" name="protonPath" placeholder="~/GE-Proton30" />
+        <input type="text" class="form-control" name="protonPath" placeholder="~/GE-Proton30" required />
+        <div class="invalid-feedback">
+          Please set valid Proton Path
+        </div>
       </div>
       <div class="mb-3">
         <label for="prefixPath" class="form-label">Prefix Path</label>
-        <input type="text" class="form-control" name="prefixPath" placeholder="~/.wine" />
+        <input type="text" class="form-control" name="prefixPath" placeholder="~/.wine" required />
+        <div class="invalid-feedback">
+          Please set valid Wine Prefix Path
+        </div>
       </div>
       <div class="mb-3">
         <label for="launcherPathExe" class="form-label">Run this file</label>
-        <input type="text" class="form-control" name="launcherPathExe" placeholder="~/foo.exe" />
+        <input type="text" class="form-control" name="launcherPathExe" placeholder="~/foo.exe" required />
+        <div class="invalid-feedback">
+          Please set valid Executable Path
+        </div>
       </div>
       <div class="mb-3">
         <label for="launcherExeArgs" class="form-label">Run with this arguments</label>
@@ -29,7 +41,10 @@
         <label for="launcherGameId" class="form-label">Game ID. You can find ID in <a
             href="https://umu.openwinecomponents.org/">umu-database</a>. If not found. Make it custom one and
           unique for your games.</label>
-        <input type="text" class="form-control" name="launcherGameId" placeholder="umu-271590" />
+        <input type="text" class="form-control" name="launcherGameId" placeholder="umu-271590" required />
+        <div class="invalid-feedback">
+          Please set valid your Game ID
+        </div>
       </div>
       <div class="mb-3">
         <label for="launcherGameStore" class="form-label">Game store</label>
@@ -49,4 +64,5 @@
   </div>
 </div>
 
+<script type="text/javascript" src="/assets/js/create.js"></script>
 {{end}}
