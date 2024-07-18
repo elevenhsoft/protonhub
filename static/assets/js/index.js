@@ -91,6 +91,8 @@
         body: JSON.stringify({ "gameid": gameId })
       });
     }
+
+    location.reload();
   }
 
   async function runWinetricks(gameId, verbs) {

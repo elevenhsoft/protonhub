@@ -80,8 +80,6 @@ func DeleteHandler(w http.ResponseWriter, r *http.Request) {
 	launcher := GetLauncherByIdFromDb(conn, data.GameID)
 
 	DeleteDataForLauncher(launcher)
-
-	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func RunHandler(w http.ResponseWriter, r *http.Request) {
