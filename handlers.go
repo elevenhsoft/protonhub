@@ -67,12 +67,18 @@ func CreateDoneHandler(w http.ResponseWriter, r *http.Request) {
 		Store:      store,
 	}
 
-	config_file := toTomlFileName(name)
+	err := CreateWinePrefixDir(obj.Prefix)
 
-	createTomlConfig(config_file, obj)
-	conn := DbConnection()
-	AddLauncherToDb(conn, config_file, name, args, obj)
+	if err != nil {
+		fmt.Printf("Creating wine prefix in %s", obj.Prefix)
+		fmt.Printf("Error: %s", err)
+	} else {
+		config_file := toTomlFileName(name)
+		createTomlConfig(config_file, obj)
 
+		conn := DbConnection()
+		AddLauncherToDb(conn, config_file, name, args, obj)
+	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
