@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io"
 	"net/http"
 	"os"
 	"os/exec"
@@ -61,6 +62,24 @@ func CreateDoneHandler(w http.ResponseWriter, r *http.Request) {
 	createTomlConfig(config_file, obj)
 	conn := DbConnection()
 	AddLauncherToDb(conn, config_file, name, args, obj)
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+type DeleteObject struct {
+	GameID string `json:"gameid"`
+}
+
+func DeleteHandler(w http.ResponseWriter, r *http.Request) {
+	body, _ := io.ReadAll(r.Body)
+
+	var data DeleteObject
+	_ = json.Unmarshal(body, &data)
+
+	conn := DbConnection()
+	launcher := GetLauncherByIdFromDb(conn, data.GameID)
+
+	DeleteDataForLauncher(launcher)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

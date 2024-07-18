@@ -144,3 +144,11 @@ UPDATE launchers SET name = ?, prefix = ?, proton = ?, game_id = ?, exefile = ?,
 	conn.Exec(sql, name, launcher.Prefix, launcher.Proton, launcher.GameID, launcher.Exe, args, launcher.Store, config)
 	defer conn.Close()
 }
+
+func RemoveLauncherFromDb(conn *sql.DB, config string) {
+	sql := `
+DELETE FROM launchers WHERE config = ?
+	`
+	conn.Exec(sql, config)
+	defer conn.Close()
+}

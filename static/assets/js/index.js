@@ -31,6 +31,7 @@
 (async () => {
   let launcherBtn = document.querySelectorAll("#launcher");
   let stopLauncherBtn = document.querySelectorAll(".stopLauncher");
+  let deleteLauncherBtn = document.querySelectorAll(".deleteLauncher");
   let launcherLogsClear = document.getElementById("launcherLogsClear");
   let editBtn = document.querySelectorAll("#edit");
   let winetricksBtn = document.getElementById("winetricks");
@@ -41,7 +42,6 @@
   async function runFetch(gameId, ele) {
     if (gameId) {
       let eventSource = new EventSource(`/run/${gameId}`);
-      let pid;
 
       eventSource.onmessage = async (event) => {
         let logger = document.getElementById("launcherLogging");
@@ -81,6 +81,18 @@
     }
   }
 
+  async function deleteFetch(gameId) {
+    if (gameId) {
+      await fetch(`/delete`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ "gameid": gameId })
+      });
+    }
+  }
+
   async function runWinetricks(gameId, verbs) {
     if (gameId && verbs) {
       let eventSource = new EventSource(`/winetricks/${gameId}/${verbs}`);
@@ -117,6 +129,15 @@
       let gameId = ele.dataset.gameId;
 
       await stopFetch(gameId);
+    });
+  });
+
+
+  deleteLauncherBtn.forEach((ele, _) => {
+    ele.addEventListener("click", async () => {
+      let gameId = ele.dataset.gameId;
+
+      await deleteFetch(gameId);
     });
   });
 

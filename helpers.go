@@ -132,6 +132,19 @@ func updateTomlFile(s string, data umu) {
 	file.WriteString(final_toml)
 }
 
+func DeleteDataForLauncher(launcher Launcher) {
+	config := GetConfigPath(launcher.Config)
+
+	err := os.Remove(config)
+
+	if err != nil {
+		fmt.Printf("Error: %s", err)
+	}
+
+	conn := DbConnection()
+	RemoveLauncherFromDb(conn, launcher.Config)
+}
+
 func GetConfigPath(cfg string) string {
 	return filepath.Join(phStorePath(), "configs", cfg)
 }
