@@ -13,8 +13,6 @@ import (
 	"strings"
 )
 
-var templates map[string]*template.Template
-
 func LoadTemplates() error {
 	if templates == nil {
 		templates = make(map[string]*template.Template)
@@ -29,10 +27,7 @@ func LoadTemplates() error {
 			continue
 		}
 
-		pt, err := template.ParseFS(files, "static/"+tmpl.Name(), "static/*.html")
-		if err != nil {
-			return err
-		}
+		pt := template.Must(template.ParseFS(files, "static/"+tmpl.Name(), "static/base.html"))
 
 		templates[tmpl.Name()] = pt
 	}
@@ -43,7 +38,15 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 	conn := DbConnection()
 	launchers := GetLaunchersFromDb(conn)
 
-	templates["index.html"].ExecuteTemplate(w, "base", launchers)
+	err := templates["index.html"].ExecuteTemplate(w, "base", launchers)
+
+	if err != nil {
+		fmt.Printf("Error: %s", err)
+	}
+}
+
+func CreateHandler(w http.ResponseWriter, r *http.Request) {
+	templates["create.html"].ExecuteTemplate(w, "base", nil)
 }
 
 func CreateDoneHandler(w http.ResponseWriter, r *http.Request) {

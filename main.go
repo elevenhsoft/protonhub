@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 )
@@ -10,8 +11,11 @@ import (
 const IP = "127.0.0.1"
 const PORT = "8080"
 
-//go:embed static/*
-var files embed.FS
+var (
+	//go:embed static/*
+	files     embed.FS
+	templates map[string]*template.Template
+)
 
 func main() {
 	// initalize store directory

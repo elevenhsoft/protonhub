@@ -8,6 +8,7 @@ import (
 
 func Routing(mux *http.ServeMux) {
 	mux.HandleFunc("GET /", RootHandler)
+	mux.HandleFunc("GET /create", CreateHandler)
 	mux.HandleFunc("POST /create", CreateDoneHandler)
 	mux.HandleFunc("POST /delete", DeleteHandler)
 	mux.HandleFunc("GET /run/{gameId}", RunHandler)
