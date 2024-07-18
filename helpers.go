@@ -141,6 +141,14 @@ func DeleteDataForLauncher(launcher Launcher) {
 		fmt.Printf("Error: %s", err)
 	}
 
+	winePrefix := translatePath(launcher.Prefix)
+
+	err = os.RemoveAll(winePrefix)
+
+	if err != nil {
+		fmt.Printf("Error: %s", err)
+	}
+
 	conn := DbConnection()
 	RemoveLauncherFromDb(conn, launcher.Config)
 }
@@ -267,6 +275,14 @@ func getNewPids() ([]ps.Process, error) {
 
 func homePath() string {
 	return os.Getenv("HOME")
+}
+
+func translatePath(path string) string {
+	if strings.HasPrefix(path, "~") {
+		return strings.ReplaceAll(path, "~", homePath())
+	}
+
+	return path
 }
 
 func phStorePath() string {
