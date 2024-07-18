@@ -135,9 +135,13 @@
 
   deleteLauncherBtn.forEach((ele, _) => {
     ele.addEventListener("click", async () => {
-      let gameId = ele.dataset.gameId;
+      let confirmation = confirm("Are you sure?");
 
-      await deleteFetch(gameId);
+      if (confirmation == true) {
+        let gameId = ele.dataset.gameId;
+
+        await deleteFetch(gameId);
+      }
     });
   });
 
