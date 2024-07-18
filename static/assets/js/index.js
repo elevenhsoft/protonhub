@@ -117,12 +117,16 @@
 
   launcherBtn.forEach((ele, _) => {
     ele.addEventListener("click", async () => {
-      ele.textContent = "Process is running...";
-      ele.setAttribute("disabled", true);
+      let confirmation = confirm("Are you sure?");
 
-      let gameId = ele.dataset.gameId;
+      if (confirmation == true) {
+        ele.textContent = "Process is running...";
+        ele.setAttribute("disabled", true);
 
-      await runFetch(gameId, ele);
+        let gameId = ele.dataset.gameId;
+
+        await runFetch(gameId, ele);
+      }
     });
   });
 
